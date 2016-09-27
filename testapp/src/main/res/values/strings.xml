@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TestApp</string>
+    <string name="no_items">There are no items in collection.</string>
+</resources>
