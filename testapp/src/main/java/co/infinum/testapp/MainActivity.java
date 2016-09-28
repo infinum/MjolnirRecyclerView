@@ -13,7 +13,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import co.infinum.mjolnirrecyclerview.MjolnirRecyclerView;
 
 public class MainActivity extends AppCompatActivity implements MainAdapter.OnClickListener<String> {
@@ -39,13 +38,11 @@ public class MainActivity extends AppCompatActivity implements MainAdapter.OnCli
 
     private MainAdapter adapter;
 
-    private Unbinder unbinder;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        unbinder = ButterKnife.bind(this);
+        ButterKnife.bind(this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setEmptyView(emptyView);
@@ -71,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements MainAdapter.OnCli
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbinder.unbind();
         adapter.cancel();
     }
 }
