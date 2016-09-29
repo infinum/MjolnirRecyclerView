@@ -24,7 +24,6 @@ import java.util.List;
  *
  * Created by Željko Plesac on 27/09/16.
  */
-
 public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<MjolnirRecyclerAdapter.ViewHolder> {
 
     public static final int TYPE_HEADER = 111;
@@ -102,9 +101,21 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         }
     }
 
+    /**
+     * Item count is calculated as sum of items, headers and footers size.
+     *
+     * @return Adapter item count.
+     */
     @Override
     public int getItemCount() {
         return headers.size() + items.size() + footers.size();
+    }
+
+    /**
+     * Returns items size. In case if there are no headers or footers, the result will be the same as for getItemCount() method.
+     */
+    public int getCollectionCount() {
+        return items.size();
     }
 
     public void setOnClickListener(OnClickListener<E> listener) {
@@ -164,14 +175,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     public void add(E item, int index) {
-        index = index - headers.size() - footers.size();
+        index = calculateIndex(index);
 
         items.add(index, item);
         notifyItemInserted(index);
     }
 
     public void addAll(Collection<E> collection, int index) {
-        index = index - headers.size() - footers.size();
+        index = calculateIndex(index);
 
         items.addAll(index, collection);
         notifyItemRangeInserted(index, collection.size());
@@ -191,7 +202,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     public void remove(int index) {
-        index = index - headers.size() - footers.size();
+        index = calculateIndex(index);
 
         if (items.remove(index) != null) {
             notifyItemRemoved(index);
@@ -199,7 +210,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     public E get(int index) {
-        index = index - headers.size() - footers.size();
+        index = calculateIndex(index);
         return items.get(index);
     }
 
@@ -208,7 +219,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     public void set(E item, int index) {
-        index = index - headers.size() - footers.size();
+        index = calculateIndex(index);
 
         items.set(index, item);
         notifyItemChanged(index);
@@ -232,6 +243,23 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
             updateItemsTask.execute(callback);
         } else {
             notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * Calculate the correct item index - we have to subtract the number of headers of index value as the RecyclerView doesn't distinguish
+     * between header rows and item rows.
+     *
+     * @param index RecyclerView row index.
+     * @return correct item index.
+     */
+    private int calculateIndex(int index) {
+        index = index - headers.size();
+
+        if (index >= items.size()) {
+            throw new IllegalStateException("Index has to be defined in range from 0 to items.size() - 1!");
+        } else {
+            return index;
         }
     }
 

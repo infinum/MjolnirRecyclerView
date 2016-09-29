@@ -10,7 +10,6 @@ import android.view.View;
  *
  * Created by Željko Plesac on 27/09/16.
  */
-
 public class MjolnirRecyclerView extends RecyclerView {
 
     private View emptyView;
@@ -46,7 +45,7 @@ public class MjolnirRecyclerView extends RecyclerView {
 
     private void checkIfEmpty() {
         if (emptyView != null && getAdapter() != null) {
-            final boolean emptyViewVisible = getAdapter().getItemCount() == 0;
+            final boolean emptyViewVisible = ((MjolnirRecyclerAdapter) getAdapter()).getCollectionCount() == 0;
             emptyView.setVisibility(emptyViewVisible ? VISIBLE : GONE);
             setVisibility(emptyViewVisible ? GONE : VISIBLE);
         }
