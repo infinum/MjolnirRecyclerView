@@ -209,6 +209,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         }
     }
 
+    /**
+     * Clears current items.
+     */
+    public void clear() {
+        items.clear();
+        notifyDataSetChanged();
+    }
+
     public E get(int index) {
         index = calculateIndex(index);
         return items.get(index);
@@ -261,14 +269,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         } else {
             return index;
         }
-    }
-
-    /**
-     * Clears current items.
-     */
-    private void clear() {
-        items.clear();
-        notifyDataSetChanged();
     }
 
     // endregion
