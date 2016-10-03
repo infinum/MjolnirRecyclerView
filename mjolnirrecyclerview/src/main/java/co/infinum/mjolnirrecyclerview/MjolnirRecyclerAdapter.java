@@ -263,6 +263,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         }
     }
 
+    /**
+     * Clears current items.
+     */
+    private void clear() {
+        items.clear();
+        notifyDataSetChanged();
+    }
+
     // endregion
 
     // region Headers and Footers
