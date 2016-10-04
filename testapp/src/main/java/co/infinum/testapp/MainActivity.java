@@ -44,9 +44,6 @@ public class MainActivity extends AppCompatActivity implements MainAdapter.OnCli
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        View footerView = getLayoutInflater().inflate(R.layout.view_footer, null);
-        View headerView = getLayoutInflater().inflate(R.layout.view_header, null);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setEmptyView(emptyView);
 
@@ -54,8 +51,8 @@ public class MainActivity extends AppCompatActivity implements MainAdapter.OnCli
         adapter.setOnClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        adapter.addHeader(headerView);
-        adapter.addFooter(footerView);
+        adapter.addHeader(R.layout.view_header);
+        adapter.addFooter(R.layout.view_footer);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {

@@ -2,12 +2,13 @@ package co.infinum.mjolnirrecyclerview;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,17 +33,17 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     public static final int TYPE_ITEM = 333;
 
+    protected OnClickListener<E> listener;
+
+    protected OnNextPageListener nextPageListener;
+
     private Context context;
 
     private List<E> items;
 
-    private List<View> headers = new ArrayList<>();
+    private int footerViewId;
 
-    private List<View> footers = new ArrayList<>();
-
-    protected OnClickListener<E> listener;
-
-    protected OnNextPageListener nextPageListener;
+    private int headerViewId;
 
     private UpdateItemsTask updateItemsTask;
 
@@ -57,12 +58,29 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         // Check if we have to inflate ItemViewHolder of HeaderFooterHolder
         if (viewType == TYPE_ITEM) {
             return onCreateItemViewHolder(parent, viewType);
-        } else {
-            FrameLayout frameLayout = new FrameLayout(parent.getContext());
-            frameLayout
-                    .setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            return new HeaderFooterViewHolder(frameLayout);
+        } else if (viewType == TYPE_HEADER) {
+            return onCreateHeaderViewHolder(headerViewId, parent);
+        } else if (viewType == TYPE_FOOTER) {
+            return onCreateFooterViewHolder(footerViewId, parent);
         }
+
+        return null;
+    }
+
+    /**
+     * Override if you need a custom implementation
+     */
+    protected ViewHolder onCreateFooterViewHolder(int footerViewId, ViewGroup parent) {
+        return new HeaderFooterViewHolder(LayoutInflater.from(getContext()).inflate(footerViewId, parent, false));
+
+    }
+
+    /**
+     * Override if you need a custom implementation
+     */
+    protected ViewHolder onCreateHeaderViewHolder(int headerViewId, ViewGroup parent) {
+        return new HeaderFooterViewHolder(LayoutInflater.from(getContext()).inflate(headerViewId, parent, false));
+
     }
 
     protected abstract ViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType);
@@ -70,34 +88,31 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     @Override
     public void onBindViewHolder(MjolnirRecyclerAdapter.ViewHolder holder, int position) {
         //check what type of view our position is
-        if (position < headers.size()) {
-            View v = headers.get(position);
-            //add our view to a header view and display it
-            prepareHeaderFooter((HeaderFooterViewHolder) holder, v);
-        } else if (position >= headers.size() + items.size()) {
-            View v = footers.get(position - items.size() - headers.size());
-            //add our view to a footer view and display it
-            prepareHeaderFooter((HeaderFooterViewHolder) holder, v);
-        } else {
-            E item = get(position);
-            holder.bind(item, position, Collections.emptyList());
+
+        switch (getItemViewType(position)) {
+            case TYPE_ITEM:
+                E item = get(position);
+                holder.bind(item, position, Collections.emptyList());
+                break;
+            default:
+                //Nothing, for now.
+                break;
+
         }
     }
 
     @Override
     public void onBindViewHolder(MjolnirRecyclerAdapter.ViewHolder holder, int position, List<Object> payloads) {
+
         //check what type of view our position is
-        if (position < headers.size()) {
-            View v = headers.get(position);
-            //add our view to a header view and display it
-            prepareHeaderFooter((HeaderFooterViewHolder) holder, v);
-        } else if (position >= headers.size() + items.size()) {
-            View v = footers.get(position - items.size() - headers.size());
-            //add our view to a footer view and display it
-            prepareHeaderFooter((HeaderFooterViewHolder) holder, v);
-        } else {
-            E item = get(position);
-            holder.bind(item, position, payloads);
+        switch (getItemViewType(position)) {
+            case TYPE_ITEM:
+                E item = get(position);
+                holder.bind(item, position, payloads);
+                break;
+            default:
+                //Nothing, for now.
+                break;
         }
     }
 
@@ -108,7 +123,19 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      */
     @Override
     public int getItemCount() {
-        return headers.size() + items.size() + footers.size();
+
+        int itemCount = items != null ? items.size() : 0;
+
+        if (hasFooter()) {
+            itemCount++;
+        }
+
+        if (hasHeader()) {
+            itemCount++;
+        }
+
+        return itemCount;
+
     }
 
     /**
@@ -140,33 +167,13 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         }
     }
 
-    private class UpdateItemsTask extends AsyncTask<DiffUtil.Callback, Void, DiffUtil.DiffResult> {
-
-        @Override
-        protected DiffUtil.DiffResult doInBackground(DiffUtil.Callback... params) {
-            if (params != null) {
-                return DiffUtil.calculateDiff(params[0]);
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(DiffUtil.DiffResult diffResult) {
-            super.onPostExecute(diffResult);
-            if (diffResult != null) {
-                diffResult.dispatchUpdatesTo(MjolnirRecyclerAdapter.this);
-            }
-        }
-    }
-
-    // region ArrayAdapter methods
-
     public void add(E item) {
         int position = items.size();
         items.add(item);
         notifyItemInserted(position);
     }
+
+    // region ArrayAdapter methods
 
     public void addAll(Collection<E> collection) {
         int position = items.size();
@@ -262,7 +269,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @return correct item index.
      */
     private int calculateIndex(int index) {
-        index = index - headers.size();
+        index = index - (hasHeader() ? 1 : 0);
 
         if (index >= items.size()) {
             throw new IllegalStateException("Index has to be defined in range from 0 to items.size() - 1!");
@@ -271,101 +278,73 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         }
     }
 
+    /**
+     * Add a footer to this adapter
+     *
+     * @param footerViewId layout resource id
+     */
+    public void addFooter(@LayoutRes int footerViewId) {
+        this.footerViewId = footerViewId;
+        notifyItemInserted(getItemCount());
+    }
+
+    /**
+     * Add a header to this adapter
+     *
+     * @param headerViewId layout resource id
+     */
+    public void addHeader(@LayoutRes int headerViewId) {
+        this.headerViewId = headerViewId;
+        notifyItemInserted(0);
+    }
+
+    /**
+     * @return true if {@param footerViewId} is not 0, false otherwise
+     */
+    private boolean hasFooter() {
+        return footerViewId != 0;
+    }
+
+    /**
+     * @return true if {@param headerViewId} is not 0, false otherwise
+     */
+    private boolean hasHeader() {
+        return headerViewId != 0;
+    }
+
+    /**
+     * @return true if item at {@param postion} is footer
+     */
+    protected boolean isFooter(int position) {
+        return hasFooter() && position == getItemCount() - 1;
+    }
+
+    /**
+     * @return true if item at {@param postion} is header
+     */
+    protected boolean isHeader(int position) {
+        return hasHeader() && position == 0;
+    }
+
     // endregion
 
     // region Headers and Footers
 
-    public class HeaderFooterViewHolder extends ViewHolder {
 
-        FrameLayout base;
-
-        public HeaderFooterViewHolder(View itemView) {
-            super(itemView);
-            this.base = (FrameLayout) itemView;
-        }
-
-        @Override
-        protected void bind(E item, int position, List<Object> payloads) {
-            this.base = (FrameLayout) itemView;
-        }
-    }
-
-    //add a footer to the adapter
-    public void addFooter(View footer) {
-        if (!footers.contains(footer)) {
-            footers.add(footer);
-            //animate
-            notifyItemInserted(headers.size() + items.size() + footers.size() - 1);
-        }
-    }
-
-    //remove a footer from the adapter
-    public void removeFooter(View footer) {
-        if (footers.contains(footer)) {
-            //animate
-            notifyItemRemoved(headers.size() + items.size() + footers.indexOf(footer));
-            footers.remove(footer);
-            if (footer.getParent() != null) {
-                ((ViewGroup) footer.getParent()).removeView(footer);
-            }
-        }
-    }
-
-    //add a header to the adapter
-    public void addHeader(View header) {
-        if (!headers.contains(header)) {
-            headers.add(header);
-            //animate
-            notifyItemInserted(headers.size() - 1);
-        }
-    }
-
-    //remove a header from the adapter
-    public void removeHeader(View header) {
-        if (headers.contains(header)) {
-            //animate
-            notifyItemRemoved(headers.indexOf(header));
-            headers.remove(header);
-            if (header.getParent() != null) {
-                ((ViewGroup) header.getParent()).removeView(header);
-            }
-        }
-    }
-
-    private void prepareHeaderFooter(HeaderFooterViewHolder vh, View view) {
-        //empty out our FrameLayout and replace with our header/footer
-        vh.base.removeAllViews();
-        vh.base.addView(view);
-    }
-
-    public List<View> getHeaders() {
-        return headers;
-    }
-
-    public List<View> getFooters() {
-        return footers;
-    }
-
+    /**
+     * @param position current adapter position
+     * @return item view type base od {@param position}
+     */
     @Override
     public int getItemViewType(int position) {
+
         //check what type our position is, based on the assumption that the order is headers > items > footers
-        if (position < headers.size()) {
+        if (isHeader(position)) {
             return TYPE_HEADER;
-        } else if (position >= headers.size() + items.size()) {
+        } else if (isFooter(position)) {
             return TYPE_FOOTER;
         }
         return TYPE_ITEM;
-    }
-
-    // endregion
-
-    protected abstract class ViewHolder extends RecyclerView.ViewHolder {
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-        }
-
-        protected abstract void bind(E item, int position, List<Object> payloads);
     }
 
 
@@ -377,5 +356,47 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     public interface OnNextPageListener {
 
         void onScrolledToNextPage();
+    }
+
+    // endregion
+
+    private class UpdateItemsTask extends AsyncTask<DiffUtil.Callback, Void, DiffUtil.DiffResult> {
+
+        @Override
+        protected DiffUtil.DiffResult doInBackground(DiffUtil.Callback... params) {
+            if (params != null) {
+                return DiffUtil.calculateDiff(params[0]);
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(DiffUtil.DiffResult diffResult) {
+            super.onPostExecute(diffResult);
+            if (diffResult != null) {
+                diffResult.dispatchUpdatesTo(MjolnirRecyclerAdapter.this);
+            }
+        }
+    }
+
+    public class HeaderFooterViewHolder extends ViewHolder {
+
+        public HeaderFooterViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        @Override
+        protected void bind(E item, int position, List<Object> payloads) {
+        }
+    }
+
+    protected abstract class ViewHolder extends RecyclerView.ViewHolder {
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        protected abstract void bind(E item, int position, List<Object> payloads);
     }
 }
