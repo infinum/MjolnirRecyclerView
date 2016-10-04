@@ -45,6 +45,10 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     private int headerViewId;
 
+    private View footerView;
+
+    private View headerView;
+
     private UpdateItemsTask updateItemsTask;
 
     public MjolnirRecyclerAdapter(Context context, Collection<E> list) {
@@ -71,7 +75,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Override if you need a custom implementation
      */
     protected ViewHolder onCreateFooterViewHolder(int footerViewId, ViewGroup parent) {
-        return new HeaderFooterViewHolder(LayoutInflater.from(getContext()).inflate(footerViewId, parent, false));
+        footerView = LayoutInflater.from(getContext()).inflate(footerViewId, parent, false);
+        return new HeaderFooterViewHolder(footerView);
 
     }
 
@@ -79,7 +84,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Override if you need a custom implementation
      */
     protected ViewHolder onCreateHeaderViewHolder(int headerViewId, ViewGroup parent) {
-        return new HeaderFooterViewHolder(LayoutInflater.from(getContext()).inflate(headerViewId, parent, false));
+        headerView = LayoutInflater.from(getContext()).inflate(headerViewId, parent, false);
+        return new HeaderFooterViewHolder(headerView);
 
     }
 
@@ -324,6 +330,22 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      */
     protected boolean isHeader(int position) {
         return hasHeader() && position == 0;
+    }
+
+    public View getFooterView() {
+        return footerView;
+    }
+
+    public void setFooterView(View footerView) {
+        this.footerView = footerView;
+    }
+
+    public View getHeaderView() {
+        return headerView;
+    }
+
+    public void setHeaderView(View headerView) {
+        this.headerView = headerView;
     }
 
     // endregion
