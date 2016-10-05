@@ -72,7 +72,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Override if you need a custom implementation
+     * Override if you need a custom implementation.
      */
     protected ViewHolder onCreateFooterViewHolder(int footerViewId, ViewGroup parent) {
         footerView = LayoutInflater.from(getContext()).inflate(footerViewId, parent, false);
@@ -81,7 +81,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Override if you need a custom implementation
+     * Override if you need a custom implementation.
      */
     protected ViewHolder onCreateHeaderViewHolder(int headerViewId, ViewGroup parent) {
         headerView = LayoutInflater.from(getContext()).inflate(headerViewId, parent, false);
@@ -285,7 +285,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Add a footer to this adapter
+     * Add a footer to this adapter.
      *
      * @param footerViewId layout resource id
      */
@@ -295,7 +295,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Add a header to this adapter
+     * Add a header to this adapter.
      *
      * @param headerViewId layout resource id
      */
