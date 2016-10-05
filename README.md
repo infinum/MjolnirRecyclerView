@@ -38,3 +38,7 @@ As [DiffUtil](https://developer.android.com/reference/android/support/v7/util/Di
 ### 4. ArrayAdapter like methods
 
 [MjolnirRecyclerAdapter](https://github.com/infinum/MjolnirRecyclerView/blob/master/mjolnirrecyclerview/src/main/java/co/infinum/mjolnirrecyclerview/MjolnirRecyclerAdapter.java) has full support for [ArrayAdapter](https://developer.android.com/reference/android/widget/ArrayAdapter.html) methods, like add(), addAll(), reset(), remove(), set()...
+
+## Contributing
+
+Feedback and code contributions are very much welcome. Just make a pull request with a short description of your changes. By making contributions to this project you give permission for your code to be used under the same [license](LICENSE).
