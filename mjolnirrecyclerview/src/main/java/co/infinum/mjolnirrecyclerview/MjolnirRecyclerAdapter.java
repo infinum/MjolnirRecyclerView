@@ -333,17 +333,17 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * @return true if {@param footerViewId} is not 0, false otherwise
+     * @return true if {@param footerViewId} is not 0 or if {@param footerView} is not null, false otherwise
      */
     private boolean hasFooter() {
-        return footerViewId != 0 || headerView != null;
+        return footerViewId != 0 || footerView != null;
     }
 
     /**
-     * @return true if {@param headerViewId} is not 0, false otherwise
+     * @return true if {@param headerViewId} is not 0 or if {@param headerView} is not null, false otherwise
      */
     private boolean hasHeader() {
-        return headerViewId != 0 || footerView != null;
+        return headerViewId != 0 || headerView != null;
     }
 
     /**
