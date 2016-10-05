@@ -290,6 +290,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Add a footer to this adapter.
+     * This method has higher priority than {@link #addFooter(android.view.View)}.
      *
      * @param footerViewId layout resource id
      */
@@ -300,6 +301,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Add a footer view to this adapter.
+     * This method has lower priority than {@link #addFooter(int)}.
      *
      * @param footerView layout view
      */
@@ -310,6 +312,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Add a header to this adapter.
+     * This method has higher priority than {@link #addHeader(android.view.View)}.
      *
      * @param headerViewId layout resource id
      */
@@ -320,6 +323,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Add a header view to this adapter.
+     * This method has lower priority than {@link #addHeader(int)}.
      *
      * @param headerView layout view
      */
