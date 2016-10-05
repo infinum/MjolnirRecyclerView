@@ -3,7 +3,7 @@
 *.ap_
 
 # Files for the ART/Dalvik VM
-*.dex
+*.dexter
 
 # Java class files
 *.class
@@ -39,3 +39,5 @@ captures/
 
 # Keystore files
 *.jks
+
+.DS_Store
