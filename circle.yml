@@ -33,4 +33,4 @@ test:
     - ./gradlew check -PdisablePreDex
   post:
     # copy the build outputs to artifacts
-    - cp -r app/build/reports $CIRCLE_ARTIFACTS
+    - cp -r mjolnirrecyclerview/build/reports $CIRCLE_ARTIFACTS
