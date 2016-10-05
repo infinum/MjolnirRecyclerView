@@ -1,0 +1,35 @@
+# Build configuration file for Circle CI
+# needs to be named `circle.yml` and should be in the top level dir of the repo
+experimental:
+  # this will enable chat notifications only for certain branches
+  notify:
+    branches:
+      only:
+        - master
+        - labs
+        - development
+
+
+machine:
+  java:
+      version: oraclejdk8
+  environment:
+    # set the adb install timeout to 8 minutes (default is 2 minutes)
+    ADB_INSTALL_TIMEOUT: 8
+    JAVA_OPTS: "-Xms512m -Xmx2048m"
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,platform-tools,extra-google-google_play_services,extra-google-m2repository,android-24
+    - echo y | android update sdk --no-ui --all --filter build-tools-24.0.2
+
+test:
+  override:
+    # build the project and capture infer input
+    - ./gradlew assemble -PpreDexEnable=false -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms512m -Xmx512m -XX:MaxPermSize=2048m"
+    # run static analysis
+    - ./gradlew checkstyle pmd findbugs lintBigbetworldDebug -PpreDexEnable=false -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms512m -Xmx512m -XX:MaxPermSize=2048m"
+    # copy the build outputs to artifacts
+    - cp -r app/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r app/build/reports $CIRCLE_ARTIFACTS
