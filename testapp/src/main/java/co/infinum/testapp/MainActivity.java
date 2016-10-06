@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements MainAdapter.OnCli
         adapter = new MainAdapter(this);
         adapter.setOnClickListener(this);
         recyclerView.setAdapter(adapter);
-
+        
         adapter.addHeader(R.layout.view_header);
         adapter.addFooter(R.layout.view_footer);
 

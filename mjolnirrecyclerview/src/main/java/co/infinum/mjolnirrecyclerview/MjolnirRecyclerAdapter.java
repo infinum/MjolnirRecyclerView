@@ -75,7 +75,9 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Override if you need a custom implementation.
      */
     protected ViewHolder onCreateFooterViewHolder(int footerViewId, ViewGroup parent) {
-        footerView = LayoutInflater.from(getContext()).inflate(footerViewId, parent, false);
+        if (footerView == null) {
+            footerView = LayoutInflater.from(getContext()).inflate(footerViewId, parent, false);
+        }
         return new HeaderFooterViewHolder(footerView);
 
     }
@@ -84,7 +86,9 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Override if you need a custom implementation.
      */
     protected ViewHolder onCreateHeaderViewHolder(int headerViewId, ViewGroup parent) {
-        headerView = LayoutInflater.from(getContext()).inflate(headerViewId, parent, false);
+        if (headerView == null) {
+            headerView = LayoutInflater.from(getContext()).inflate(headerViewId, parent, false);
+        }
         return new HeaderFooterViewHolder(headerView);
 
     }
@@ -286,6 +290,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Add a footer to this adapter.
+     * This method has higher priority than {@link #addFooter(android.view.View)}.
      *
      * @param footerViewId layout resource id
      */
@@ -295,7 +300,19 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
+     * Add a footer view to this adapter.
+     * This method has lower priority than {@link #addFooter(int)}.
+     *
+     * @param footerView layout view
+     */
+    public void addFooter(View footerView) {
+        this.footerView = footerView;
+        notifyItemInserted(getItemCount());
+    }
+
+    /**
      * Add a header to this adapter.
+     * This method has higher priority than {@link #addHeader(android.view.View)}.
      *
      * @param headerViewId layout resource id
      */
@@ -305,17 +322,28 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * @return true if {@param footerViewId} is not 0, false otherwise
+     * Add a header view to this adapter.
+     * This method has lower priority than {@link #addHeader(int)}.
+     *
+     * @param headerView layout view
      */
-    private boolean hasFooter() {
-        return footerViewId != 0;
+    public void addHeader(View headerView) {
+        this.headerView = headerView;
+        notifyItemInserted(0);
     }
 
     /**
-     * @return true if {@param headerViewId} is not 0, false otherwise
+     * @return true if {@param footerViewId} is not 0 or if {@param footerView} is not null, false otherwise
+     */
+    private boolean hasFooter() {
+        return footerViewId != 0 || footerView != null;
+    }
+
+    /**
+     * @return true if {@param headerViewId} is not 0 or if {@param headerView} is not null, false otherwise
      */
     private boolean hasHeader() {
-        return headerViewId != 0;
+        return headerViewId != 0 || headerView != null;
     }
 
     /**
