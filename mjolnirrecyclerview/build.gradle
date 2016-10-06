@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 apply from: '../config/quality.gradle'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
 
 android {
     compileSdkVersion 24
@@ -30,4 +32,118 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:recyclerview-v7:24.2.1'
     testCompile 'junit:junit:4.12'
+}
+
+ext {
+    bintrayRepo = 'android'
+    bintrayName = 'mjolnirrecyclerview'
+
+    userOrganization = 'infinum' // optional
+    publishedGroupId = 'co.infinum'
+    libraryName = 'mjolnirrecyclerview'
+    artifact = 'mjolnirrecyclerview'     // Has to be same as your library module name
+
+    libraryDescription = 'One RecyclerView to rule them all.'
+
+    // Your github repo link
+    siteUrl = 'https://github.com/infinum/MjolnirRecyclerView'
+    gitUrl = 'https://github.com/infinum/MjolnirRecyclerView.git'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'zplesac'
+    developerName = 'Zeljko Plesac'
+    developerEmail = 'zeljko.plesac@infinum.hr'
+
+    licenseName = 'Apache-2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0'
+    allLicenses = ["Apache-2.0"]
+}
+
+group = publishedGroupId
+version = libraryVersion
+
+bintray {
+
+    if (project.rootProject.file('local.properties').exists()) {
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+        user = properties.getProperty("bintray.user")
+        key = properties.getProperty("bintray.apikey")
+
+        configurations = ['archives']
+        pkg {
+            repo = bintrayRepo
+            name = bintrayName
+            userOrg = userOrganization
+            desc = libraryDescription
+            websiteUrl = siteUrl
+            vcsUrl = gitUrl
+            licenses = ["Apache-2.0"]
+            publish = true
+            publicDownloadNumbers = true
+            dryRun = false
+            version {
+                name = libraryVersion
+                desc = libraryDescription
+                released = new Date()
+                gpg {
+                    sign = true //Determines whether to GPG sign the files. The default is false
+                    passphrase = properties.getProperty("bintray.gpg.password")
+                    //Optional. The passphrase for GPG signing'
+                }
+            }
+        }
+    }
+
+}
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                groupId publishedGroupId
+                artifactId artifact
+
+                // Add your description here
+                name libraryName
+                description libraryDescription
+                url siteUrl
+
+                // Set your license
+                licenses {
+                    license {
+                        name licenseName
+                        url licenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                        id developerId
+                        name developerName
+                        email developerEmail
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
 }
