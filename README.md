@@ -2,6 +2,8 @@ MjolnirRecyclerView
 ==========
 
 [![CircleCI](https://circleci.com/gh/infinum/MjolnirRecyclerView/tree/master.svg?style=svg&circle-token=d7d31554a2af2654f26885397e9dda150cc07428)](https://circleci.com/gh/infinum/MjolnirRecyclerView/tree/master)
+[![JCenter](https://img.shields.io/badge/JCenter-1.0.0-red.svg?style=flat)](https://bintray.com/infinum/android/mjolnirrecyclerview/view)
+[![Method count](https://img.shields.io/badge/Methods count-154-e91e63.svg)](http://www.methodscount.com/?lib=co.infinum%3Amjolnirrecyclerview%3A1.0.0)
 
 Provides a simple way to extend the default RecyclerView behaviour with support for headers, footers, empty view, DiffUtil and ArrayAdapter like methods.
 
