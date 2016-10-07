@@ -7,6 +7,17 @@ MjolnirRecyclerView
 
 Provides a simple way to extend the default RecyclerView behaviour with support for headers, footers, empty view, DiffUtil and ArrayAdapter like methods.
 
+## Usage
+
+
+Add the library as a dependency to your ```build.gradle```
+
+```groovy
+compile 'co.infinum:mjolnirrecyclerview:version@aar'
+```
+
+Check the latest version [here](https://bintray.com/search?query=mjolnirrecyclerview).
+
 ## Features
 
 ### 1. Header & footer support
