@@ -295,7 +295,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param footerViewId layout resource id
      */
     public void addFooter(@LayoutRes int footerViewId) {
-        int position = getItemCount();
+        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
         this.footerViewId = footerViewId;
         notifyItemInserted(position);
     }
@@ -307,7 +307,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param footerView layout view
      */
     public void addFooter(View footerView) {
-        int position = getItemCount();
+        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
         this.footerView = footerView;
         notifyItemInserted(position);
     }
