@@ -20,9 +20,9 @@ import java.util.List;
  * 1. Header and footer support
  * 2. DiffUtil support
  * 3. ArrayAdapter methods
- *
+ * <p>
  * Use it in combination with {@link co.infinum.mjolnirrecyclerview.MjolnirRecyclerView} to also get support for Empty views.
- *
+ * <p>
  * Created by Željko Plesac on 27/09/16.
  */
 public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<MjolnirRecyclerAdapter.ViewHolder> {
@@ -295,8 +295,9 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param footerViewId layout resource id
      */
     public void addFooter(@LayoutRes int footerViewId) {
+        int position = getItemCount();
         this.footerViewId = footerViewId;
-        notifyItemInserted(getItemCount());
+        notifyItemInserted(position);
     }
 
     /**
@@ -306,8 +307,9 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param footerView layout view
      */
     public void addFooter(View footerView) {
+        int position = getItemCount();
         this.footerView = footerView;
-        notifyItemInserted(getItemCount());
+        notifyItemInserted(position);
     }
 
     /**
