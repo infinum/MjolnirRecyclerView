@@ -314,22 +314,62 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Add a header to this adapter.
      * This method has higher priority than {@link #addHeader(android.view.View)}.
      *
+     * Deprecated in version 1.1.0, use  {@link #addHeader(View headerView, boolean shouldReplace)} instead.
+     *
      * @param headerViewId layout resource id
      */
+    @Deprecated
     public void addHeader(@LayoutRes int headerViewId) {
         this.headerViewId = headerViewId;
         notifyItemInserted(0);
     }
 
     /**
+     * Add a header view to this adapter. If header already exists, it will be replaced depending on the {@param shouldReplace} value.
+     *
+     * @param headerViewId  layout view
+     * @param shouldReplace should we replace header if it already exists
+     * @return true if header was added/replaced, false otherwise.
+     */
+    public boolean addHeader(@LayoutRes int headerViewId, boolean shouldReplace) {
+        if (!hasHeader() || hasHeader() && shouldReplace) {
+            this.headerViewId = headerViewId;
+            notifyItemInserted(0);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Add a header view to this adapter.
      * This method has lower priority than {@link #addHeader(int)}.
      *
+     * Deprecated in version 1.1.0, use  {@link #addHeader(View headerView, boolean shouldReplace)} instead.
+     *
      * @param headerView layout view
      */
+    @Deprecated
     public void addHeader(View headerView) {
         this.headerView = headerView;
         notifyItemInserted(0);
+    }
+
+    /**
+     * Add a header view to this adapter. If header already exists, it will be replaced depending on the {@param shouldReplace} value.
+     *
+     * @param headerView    layout view
+     * @param shouldReplace should we replace header if it already exists
+     * @return true if header was added/replaced, false otherwise.
+     */
+    public boolean addHeader(View headerView, boolean shouldReplace) {
+        if (!hasHeader() || hasHeader() && shouldReplace) {
+            this.headerView = headerView;
+            notifyItemInserted(0);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
