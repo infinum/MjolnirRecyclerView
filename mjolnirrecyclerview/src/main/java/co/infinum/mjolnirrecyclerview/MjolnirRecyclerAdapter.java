@@ -292,8 +292,11 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Add a footer to this adapter.
      * This method has higher priority than {@link #addFooter(android.view.View)}.
      *
+     * Deprecated in version 1.1.0, use  {@link #addFooter(int footerViewId, boolean shouldReplace)  instead.
+     *
      * @param footerViewId layout resource id
      */
+    @Deprecated
     public void addFooter(@LayoutRes int footerViewId) {
         int position = getCollectionCount() + (hasHeader() ? 1 : 0);
         this.footerViewId = footerViewId;
@@ -301,11 +304,33 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
+     * Add a footer view to this adapter. If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
+     *
+     * @param footerViewId  layout view id.
+     * @param shouldReplace should we replace footer if it already exists
+     * @return true if footer was added/replaced, false otherwise.
+     */
+    public boolean addFooter(@LayoutRes int footerViewId, boolean shouldReplace) {
+        if (!hasFooter() || hasFooter() && shouldReplace) {
+            removeFooter();
+            int position = getCollectionCount() + (hasHeader() ? 1 : 0);
+            this.footerViewId = footerViewId;
+            notifyItemInserted(position);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Add a footer view to this adapter.
      * This method has lower priority than {@link #addFooter(int)}.
      *
+     * Deprecated in version 1.1.0, use  {@link #addFooter(View headerView, boolean shouldReplace)} instead.
+     *
      * @param footerView layout view
      */
+    @Deprecated
     public void addFooter(View footerView) {
         int position = getCollectionCount() + (hasHeader() ? 1 : 0);
         this.footerView = footerView;
@@ -313,10 +338,29 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
+     * Add a footer view to this adapter. If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
+     *
+     * @param footerView    layout view
+     * @param shouldReplace should we replace footer if it already exists
+     * @return true if footer was added/replaced, false otherwise.
+     */
+    public boolean addFooter(View footerView, boolean shouldReplace) {
+        if (!hasFooter() || hasFooter() && shouldReplace) {
+            removeFooter();
+            int position = getCollectionCount() + (hasHeader() ? 1 : 0);
+            this.footerView = footerView;
+            notifyItemInserted(position);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Add a header to this adapter.
      * This method has higher priority than {@link #addHeader(android.view.View)}.
      *
-     * Deprecated in version 1.1.0, use  {@link #addHeader(View headerView, boolean shouldReplace)} instead.
+     * Deprecated in version 1.1.0, use  {@link #addHeader(int headerViewId, boolean shouldReplace)} instead.
      *
      * @param headerViewId layout resource id
      */
@@ -329,12 +373,13 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     /**
      * Add a header view to this adapter. If header already exists, it will be replaced depending on the {@param shouldReplace} value.
      *
-     * @param headerViewId  layout view
+     * @param headerViewId  layout view id.
      * @param shouldReplace should we replace header if it already exists
      * @return true if header was added/replaced, false otherwise.
      */
     public boolean addHeader(@LayoutRes int headerViewId, boolean shouldReplace) {
         if (!hasHeader() || hasHeader() && shouldReplace) {
+            removeHeader();
             this.headerViewId = headerViewId;
             notifyItemInserted(0);
             return true;
@@ -366,11 +411,36 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      */
     public boolean addHeader(View headerView, boolean shouldReplace) {
         if (!hasHeader() || hasHeader() && shouldReplace) {
+            removeHeader();
             this.headerView = headerView;
             notifyItemInserted(0);
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Removes header view from the RecyclerView (if existing).
+     */
+    public void removeHeader() {
+        if (hasHeader()) {
+            headerView = null;
+            headerViewId = 0;
+            notifyItemRemoved(0);
+        }
+    }
+
+    /**
+     * Removes footer view from the RecyclerView (if existing).
+     */
+    public void removeFooter() {
+        if (hasFooter()) {
+            footerView = null;
+            footerViewId = 0;
+
+            int position = getCollectionCount() + (hasHeader() ? 1 : 0);
+            notifyItemRemoved(position);
         }
     }
 

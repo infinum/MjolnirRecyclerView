@@ -50,17 +50,28 @@ public class MainActivity extends AppCompatActivity implements MainAdapter.OnCli
         adapter = new MainAdapter(this);
         adapter.setOnClickListener(this);
         recyclerView.setAdapter(adapter);
-        
-        adapter.addHeader(R.layout.view_header);
-        adapter.addFooter(R.layout.view_footer);
+
+        adapter.addHeader(R.layout.view_header, true);
+        adapter.addFooter(R.layout.view_footer, false);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                adapter.reset(ITEMS);
+                if (!isFinishing()) {
+                    adapter.reset(ITEMS);
+                }
             }
         }, 5000);
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing()) {
+                    adapter.removeFooter();
+                }
+            }
+        }, 7000);
     }
 
     @Override
