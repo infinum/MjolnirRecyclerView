@@ -311,7 +311,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @return true if footer was added/replaced, false otherwise.
      */
     public boolean addFooter(@LayoutRes int footerViewId, boolean shouldReplace) {
-        if (!hasFooter() || hasFooter() && shouldReplace) {
+        if (shouldReplace || !hasFooter()) {
             removeFooter();
             int position = getCollectionCount() + (hasHeader() ? 1 : 0);
             this.footerViewId = footerViewId;
@@ -345,7 +345,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @return true if footer was added/replaced, false otherwise.
      */
     public boolean addFooter(View footerView, boolean shouldReplace) {
-        if (!hasFooter() || hasFooter() && shouldReplace) {
+        if (shouldReplace || !hasFooter()) {
             removeFooter();
             int position = getCollectionCount() + (hasHeader() ? 1 : 0);
             this.footerView = footerView;
@@ -378,7 +378,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @return true if header was added/replaced, false otherwise.
      */
     public boolean addHeader(@LayoutRes int headerViewId, boolean shouldReplace) {
-        if (!hasHeader() || hasHeader() && shouldReplace) {
+        if (shouldReplace || !hasHeader()) {
             removeHeader();
             this.headerViewId = headerViewId;
             notifyItemInserted(0);
@@ -410,7 +410,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @return true if header was added/replaced, false otherwise.
      */
     public boolean addHeader(View headerView, boolean shouldReplace) {
-        if (!hasHeader() || hasHeader() && shouldReplace) {
+        if (shouldReplace || !hasHeader()) {
             removeHeader();
             this.headerView = headerView;
             notifyItemInserted(0);
@@ -476,16 +476,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         return footerView;
     }
 
-    public void setFooterView(View footerView) {
-        this.footerView = footerView;
-    }
-
     public View getHeaderView() {
         return headerView;
-    }
-
-    public void setHeaderView(View headerView) {
-        this.headerView = headerView;
     }
 
     // endregion
