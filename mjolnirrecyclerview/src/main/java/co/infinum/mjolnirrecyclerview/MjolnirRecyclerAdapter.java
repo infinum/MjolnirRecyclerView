@@ -45,6 +45,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     private int headerViewId;
 
+    private int nextPageOffset = 1;
+
     private View footerView;
 
     private View headerView;
@@ -97,18 +99,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     @Override
     public void onBindViewHolder(MjolnirRecyclerAdapter.ViewHolder holder, int position) {
-        //check what type of view our position is
-
-        switch (getItemViewType(position)) {
-            case TYPE_ITEM:
-                E item = get(position);
-                holder.bind(item, position, Collections.emptyList());
-                break;
-            default:
-                //Nothing, for now.
-                break;
-
-        }
+        onBindViewHolder(holder, position, Collections.emptyList());
     }
 
     @Override
@@ -119,6 +110,10 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
             case TYPE_ITEM:
                 E item = get(position);
                 holder.bind(item, position, payloads);
+
+                if (nextPageListener != null && position >= getCollectionCount() - getNextPageOffset()) {
+                    nextPageListener.onScrolledToNextPage();
+                }
                 break;
             default:
                 //Nothing, for now.
@@ -157,6 +152,11 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     public void setOnClickListener(OnClickListener<E> listener) {
         this.listener = listener;
+    }
+
+    public void setOnNextPageListener(OnNextPageListener listener, int nextPageOffset) {
+        this.nextPageOffset = nextPageOffset;
+        setOnNextPageListener(listener);
     }
 
     public void setOnNextPageListener(OnNextPageListener nextPageListener) {
@@ -478,6 +478,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     public View getHeaderView() {
         return headerView;
+    }
+
+    public int getNextPageOffset() {
+        return nextPageOffset;
+    }
+
+    public void setNextPageOffset(int nextPageOffset) {
+        this.nextPageOffset = nextPageOffset;
     }
 
     // endregion
