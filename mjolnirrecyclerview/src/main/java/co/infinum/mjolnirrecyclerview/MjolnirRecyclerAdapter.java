@@ -58,7 +58,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     @Override
-    public final ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         // Check if we have to inflate ItemViewHolder of HeaderFooterHolder
         if (viewType == TYPE_ITEM) {
