@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.button_scroll)
-    void onScrollexampleClick() {
+    void onScrollExampleClick() {
         Intent intent = new Intent(this, NextPageListenerActivity.class);
         startActivity(intent);
     }
