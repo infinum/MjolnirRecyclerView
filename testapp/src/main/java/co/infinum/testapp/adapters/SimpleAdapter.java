@@ -1,4 +1,4 @@
-package co.infinum.testapp;
+package co.infinum.testapp.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,13 +12,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import co.infinum.mjolnirrecyclerview.MjolnirRecyclerAdapter;
+import co.infinum.testapp.R;
 
 /**
  * Created by Željko Plesac on 27/09/16.
  */
-public class MainAdapter extends MjolnirRecyclerAdapter<String> {
+public class SimpleAdapter extends MjolnirRecyclerAdapter<String> {
 
-    public MainAdapter(Context context) {
+    public SimpleAdapter(Context context) {
         super(context, Collections.<String>emptyList());
     }
 

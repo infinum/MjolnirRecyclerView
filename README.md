@@ -55,3 +55,10 @@ As [DiffUtil](https://developer.android.com/reference/android/support/v7/util/Di
 ## Contributing
 
 Feedback and code contributions are very much welcome. Just make a pull request with a short description of your changes. By making contributions to this project you give permission for your code to be used under the same [license](LICENSE).
+
+## Credits
+
+Maintained and sponsored by
+[Infinum] (http://www.infinum.co).
+
+<img src="https://infinum.co/infinum.png" width="264">
