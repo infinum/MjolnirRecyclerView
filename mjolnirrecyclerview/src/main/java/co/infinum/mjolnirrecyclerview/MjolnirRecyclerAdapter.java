@@ -114,8 +114,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                 E item = get(position);
                 holder.bind(item, position, payloads);
 
-                if (nextPageListener != null && !isLoading &&
-                        position >= getCollectionCount() - getNextPageOffset()) {
+                if (nextPageListener != null && !isLoading
+                        && position >= getCollectionCount() - getNextPageOffset()) {
                     isLoading = true;
                     nextPageListener.onScrolledToNextPage();
                 }
