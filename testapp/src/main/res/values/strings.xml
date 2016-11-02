@@ -6,4 +6,6 @@
     <string name="simple_example">Simple example</string>
     <string name="example_update">Example update</string>
     <string name="update_content">Update content</string>
+    <string name="loading">Loading...</string>
+    <string name="example_scroll">Example next page listener</string>
 </resources>

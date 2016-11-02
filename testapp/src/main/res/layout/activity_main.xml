@@ -12,14 +12,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button_simple"
+            android:layout_centerHorizontal="true"
             android:text="@string/simple_example"/>
 
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
             android:layout_below="@+id/button_simple"
             android:id="@+id/button_update"
             android:text="@string/example_update"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/button_update"
+            android:id="@+id/button_scroll"
+            android:text="@string/example_scroll"/>
 
 </RelativeLayout>

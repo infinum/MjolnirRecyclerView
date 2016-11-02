@@ -182,13 +182,17 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         }
     }
 
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    // region ArrayAdapter methods
+
     public void add(E item) {
         int position = items.size();
         items.add(item);
         notifyItemInserted(position);
     }
-
-    // region ArrayAdapter methods
 
     public void addAll(Collection<E> collection) {
         int position = items.size();
