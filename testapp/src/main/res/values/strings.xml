@@ -3,4 +3,7 @@
     <string name="no_items">There are no items in collection.</string>
     <string name="footer">Example footer</string>
     <string name="header">Example header</string>
+    <string name="simple_example">Simple example</string>
+    <string name="example_update">Example update</string>
+    <string name="update_content">Update content</string>
 </resources>
