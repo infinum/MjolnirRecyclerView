@@ -1,4 +1,4 @@
-package co.infinum.testapp;
+package co.infinum.testapp.activities;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,8 +14,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import co.infinum.mjolnirrecyclerview.MjolnirRecyclerView;
+import co.infinum.testapp.R;
+import co.infinum.testapp.adapters.SimpleAdapter;
 
-public class MainActivity extends AppCompatActivity implements MainAdapter.OnClickListener<String> {
+public class SimpleActivity extends AppCompatActivity implements SimpleAdapter.OnClickListener<String> {
 
     private static final List<String> ITEMS = Collections.unmodifiableList(Arrays.asList(
             "First",
@@ -36,18 +38,18 @@ public class MainActivity extends AppCompatActivity implements MainAdapter.OnCli
     @BindView(R.id.empty_view)
     View emptyView;
 
-    private MainAdapter adapter;
+    private SimpleAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_simple);
         ButterKnife.bind(this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setEmptyView(emptyView);
 
-        adapter = new MainAdapter(this);
+        adapter = new SimpleAdapter(this);
         adapter.setOnClickListener(this);
         recyclerView.setAdapter(adapter);
 
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements MainAdapter.OnCli
             @Override
             public void run() {
                 if (!isFinishing()) {
-                    adapter.reset(ITEMS);
+                    adapter.addAll(ITEMS);
                 }
             }
         }, 5000);

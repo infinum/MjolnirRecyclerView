@@ -3,6 +3,7 @@ package co.infinum.mjolnirrecyclerview;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
@@ -272,11 +273,21 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         items.clear();
         items.addAll(collection);
         if (callback != null) {
-            updateItemsTask = new UpdateItemsTask();
-            updateItemsTask.execute(callback);
+            update(callback);
         } else {
             notifyDataSetChanged();
         }
+    }
+
+    /**
+     * Update current adapter state by executing UpdateItems, which will execute UpdateItems task with {@param callback} as
+     * input parameter.
+     *
+     * @param callback DiffUtil callback, which is used to update the items.
+     */
+    public void update(@NonNull DiffUtil.Callback callback) {
+        updateItemsTask = new UpdateItemsTask();
+        updateItemsTask.execute(callback);
     }
 
     /**
