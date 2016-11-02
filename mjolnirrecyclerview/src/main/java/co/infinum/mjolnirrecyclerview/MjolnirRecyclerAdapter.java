@@ -53,6 +53,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     private UpdateItemsTask updateItemsTask;
 
+    protected boolean isLoading = false;
+
     public MjolnirRecyclerAdapter(Context context, Collection<E> list) {
         this.context = context;
         this.items = new ArrayList<>(list);
@@ -111,7 +113,9 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                 E item = get(position);
                 holder.bind(item, position, payloads);
 
-                if (nextPageListener != null && position >= getCollectionCount() - getNextPageOffset()) {
+                if (nextPageListener != null && !isLoading &&
+                        position >= getCollectionCount() - getNextPageOffset()) {
+                    isLoading = true;
                     nextPageListener.onScrolledToNextPage();
                 }
                 break;
@@ -189,6 +193,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         int position = items.size();
         items.addAll(collection);
         notifyItemRangeInserted(position, collection.size());
+        isLoading = false;
     }
 
     public void add(E item, int index) {
@@ -196,6 +201,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
         items.add(index, item);
         notifyItemInserted(index);
+        isLoading = false;
     }
 
     public void addAll(Collection<E> collection, int index) {
@@ -203,6 +209,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
         items.addAll(index, collection);
         notifyItemRangeInserted(index, collection.size());
+        isLoading = false;
     }
 
     public void remove(E item) {
@@ -252,6 +259,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     public void reset(Collection<E> collection) {
         reset(collection, null);
+        isLoading = false;
     }
 
     /**
