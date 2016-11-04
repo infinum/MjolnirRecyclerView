@@ -223,6 +223,9 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
 
     public E get(int index) {
+        if (index >= items.size()) {
+            throw new IllegalStateException("Index is defined in wrong range!");
+        }
         return items.get(index);
     }
 
@@ -286,7 +289,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * 2. If we are trying to perform some action on the adapter, that the index value has to be incremented by 1
      * if adapter contains header view.
      *
-     * @param index RecyclerView row index.
+     * @param index         RecyclerView row index.
      * @param isViewBinding boolean value, which indicates whether we are trying to bind the view or perform some action on adapter.
      * @return correct item index.
      */
