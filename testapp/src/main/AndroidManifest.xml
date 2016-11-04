@@ -22,6 +22,9 @@
         <activity
                 android:name=".activities.UpdateActivity"
                 android:screenOrientation="portrait"/>
+        <activity
+                android:name=".activities.EmptyViewActivity"
+                android:screenOrientation="portrait"/>
 
     </application>
 
