@@ -6,4 +6,6 @@
     <string name="simple_example">Simple example</string>
     <string name="example_update">Example update</string>
     <string name="update_content">Update content</string>
+    <string name="example_empty_view_with_no_adapter_set">Example empty view with no adapter set</string>
+
 </resources>
