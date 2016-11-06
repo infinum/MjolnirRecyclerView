@@ -16,20 +16,30 @@ public class MjolnirRecyclerView extends RecyclerView {
 
     private boolean showEmptyViewIfAdapterNotSet = false;
 
+    /**
+     * Custom AdapterDataObserver observer, which has two functions:
+     * 1. Update the empty view visibility depending on adapter's content.
+     * 2. Update the loading state of adapter, depending on whether a change of adapter's content has been detected.
+     */
     private final AdapterDataObserver observer = new AdapterDataObserver() {
         @Override
         public void onChanged() {
-            checkIfEmpty();
+            updateState();
         }
 
         @Override
         public void onItemRangeInserted(int positionStart, int itemCount) {
-            checkIfEmpty();
+            updateState();
         }
 
         @Override
         public void onItemRangeRemoved(int positionStart, int itemCount) {
+            updateState();
+        }
+
+        private void updateState() {
             checkIfEmpty();
+            ((MjolnirRecyclerAdapter) getAdapter()).setLoading(false);
         }
     };
 
@@ -63,8 +73,8 @@ public class MjolnirRecyclerView extends RecyclerView {
     }
 
     /**
-     * Sets the RecyclerView's adapter. It also checks whether the adapter collection is empty - if it is, it will automatically show
-     * empty view. Otherwise, the adapter's content will be shown.
+     * Sets the RecyclerView's adapter and registers adapter data observer, which is used to update empty view's visibility and loading
+     * state of the adapter.
      */
     @Override
     public void setAdapter(Adapter adapter) {
@@ -82,6 +92,7 @@ public class MjolnirRecyclerView extends RecyclerView {
 
     /**
      * Sets the empty view. RecyclerView can have only one empty view at the time.
+     *
      * @param emptyView view which is used as RecyclerView's empty view.
      */
     public void setEmptyView(View emptyView) {
@@ -91,7 +102,8 @@ public class MjolnirRecyclerView extends RecyclerView {
     /**
      * Sets the empty view to the RecyclerView. {@param showIfAdapterNotSet} determines should we show the empty view if adapter is
      * still not set to the RecyclerView. Default value is set to false.
-     * @param emptyView view which is used as RecyclerView's empty view.
+     *
+     * @param emptyView           view which is used as RecyclerView's empty view.
      * @param showIfAdapterNotSet determines should we show empty view if adapter is still not set to the RecyclerView.
      */
     public void setEmptyView(View emptyView, boolean showIfAdapterNotSet) {

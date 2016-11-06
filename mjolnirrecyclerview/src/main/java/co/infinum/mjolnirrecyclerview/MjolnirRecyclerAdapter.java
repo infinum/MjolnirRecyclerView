@@ -186,6 +186,10 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         return isLoading;
     }
 
+    public void setLoading(boolean loading) {
+        isLoading = loading;
+    }
+
     // region ArrayAdapter methods
 
     public void add(E item) {
@@ -198,7 +202,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         int position = items.size();
         items.addAll(collection);
         notifyItemRangeInserted(position, collection.size());
-        isLoading = false;
     }
 
     public void add(E item, int index) {
@@ -206,7 +209,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
         items.add(index, item);
         notifyItemInserted(index);
-        isLoading = false;
     }
 
     public void addAll(Collection<E> collection, int index) {
@@ -214,7 +216,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
         items.addAll(index, collection);
         notifyItemRangeInserted(index, collection.size());
-        isLoading = false;
     }
 
     public void remove(E item) {

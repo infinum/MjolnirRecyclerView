@@ -72,9 +72,9 @@ public class NextPageListenerActivity extends AppCompatActivity
     public void onScrolledToNextPage() {
         // Simulate network call by showing progress dialog and adding data to adapter with some delay.
 
-        final ProgressDialog pd = new ProgressDialog(this);
-        pd.setMessage(getString(R.string.loading));
-        pd.show();
+//        final ProgressDialog pd = new ProgressDialog(this);
+//        pd.setMessage(getString(R.string.loading));
+//        pd.show();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -82,7 +82,7 @@ public class NextPageListenerActivity extends AppCompatActivity
             public void run() {
                 if (!isFinishing()) {
                     adapter.addAll(ITEMS);
-                    pd.dismiss();
+//                    pd.dismiss();
                 }
             }
         }, 5000);
