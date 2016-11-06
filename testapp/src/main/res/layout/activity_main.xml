@@ -33,4 +33,13 @@
             android:id="@+id/button_scroll"
             android:text="@string/example_scroll"/>
 
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/button_scroll"
+            android:id="@+id/button_empty_view"
+            android:layout_centerHorizontal="true"
+            android:text="@string/example_empty_view_with_no_adapter_set"/>
+
 </RelativeLayout>
