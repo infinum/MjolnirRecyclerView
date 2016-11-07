@@ -265,7 +265,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     public void reset(Collection<E> collection) {
         reset(collection, null);
-        isLoading = false;
     }
 
     /**
