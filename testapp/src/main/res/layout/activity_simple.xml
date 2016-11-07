@@ -15,13 +15,4 @@
 
     <include
             layout="@layout/empty_view"/>
-
-    <Button
-            android:id="@+id/button_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/update_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_alignParentBottom="true"/>
 </RelativeLayout>

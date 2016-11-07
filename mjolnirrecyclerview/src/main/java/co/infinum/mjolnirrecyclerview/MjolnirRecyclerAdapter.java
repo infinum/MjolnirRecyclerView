@@ -46,11 +46,15 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     private int headerViewId;
 
+    private int nextPageOffset = 1;
+
     private View footerView;
 
     private View headerView;
 
     private UpdateItemsTask updateItemsTask;
+
+    protected boolean isLoading = false;
 
     public MjolnirRecyclerAdapter(Context context, Collection<E> list) {
         this.context = context;
@@ -110,6 +114,12 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                 position = calculateIndex(position, true);
                 E item = items.get(position);
                 holder.bind(item, position, payloads);
+
+                if (nextPageListener != null && !isLoading
+                        && position >= getCollectionCount() - getNextPageOffset()) {
+                    isLoading = true;
+                    nextPageListener.onScrolledToNextPage();
+                }
                 break;
             default:
                 //Nothing, for now.
@@ -150,6 +160,11 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         this.listener = listener;
     }
 
+    public void setOnNextPageListener(OnNextPageListener listener, int nextPageOffset) {
+        this.nextPageOffset = nextPageOffset;
+        setOnNextPageListener(listener);
+    }
+
     public void setOnNextPageListener(OnNextPageListener nextPageListener) {
         this.nextPageListener = nextPageListener;
     }
@@ -166,6 +181,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         if (updateItemsTask != null) {
             updateItemsTask.cancel(true);
         }
+    }
+
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    public void setLoading(boolean loading) {
+        isLoading = loading;
     }
 
     // region ArrayAdapter methods
@@ -498,6 +521,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     public View getHeaderView() {
         return headerView;
+    }
+
+    public int getNextPageOffset() {
+        return nextPageOffset;
+    }
+
+    public void setNextPageOffset(int nextPageOffset) {
+        this.nextPageOffset = nextPageOffset;
     }
 
     // endregion

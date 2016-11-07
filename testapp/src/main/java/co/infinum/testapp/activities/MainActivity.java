@@ -23,9 +23,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    @OnClick(R.id.button_update)
-    void onUpdateExampleClick() {
-        Intent intent = new Intent(this, UpdateActivity.class);
+    @OnClick(R.id.button_scroll)
+    void onScrollExampleClick() {
+        Intent intent = new Intent(this, NextPageListenerActivity.class);
         startActivity(intent);
     }
 
