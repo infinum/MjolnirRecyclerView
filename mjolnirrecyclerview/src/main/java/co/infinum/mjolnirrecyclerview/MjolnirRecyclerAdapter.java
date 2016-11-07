@@ -111,7 +111,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         //check what type of view our position is
         switch (getItemViewType(position)) {
             case TYPE_ITEM:
-                E item = get(position);
+                position = calculateIndex(position, true);
+                E item = items.get(position);
                 holder.bind(item, position, payloads);
 
                 if (nextPageListener != null && !isLoading
@@ -195,60 +196,59 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     public void add(E item) {
         int position = items.size();
         items.add(item);
-        notifyItemInserted(position);
+        notifyItemInserted(calculateIndex(position, false));
     }
 
     public void addAll(Collection<E> collection) {
         int position = items.size();
         items.addAll(collection);
-        notifyItemRangeInserted(position, collection.size());
+        notifyItemRangeInserted(calculateIndex(position, false), collection.size());
     }
 
     public void add(E item, int index) {
-        index = calculateIndex(index);
-
-        items.add(index, item);
-        notifyItemInserted(index);
-    }
-
-    public void addAll(Collection<E> collection, int index) {
-        index = calculateIndex(index);
-
-        items.addAll(index, collection);
-        notifyItemRangeInserted(index, collection.size());
-    }
-
-    public void remove(E item) {
-        int position = items.indexOf(item);
-        if (items.remove(item)) {
-            notifyItemRemoved(position);
+        if (index >= items.size()) {
+            throw new IllegalStateException("Index is defined in wrong range!");
+        } else {
+            items.add(index, item);
+            notifyItemInserted(calculateIndex(index, false));
         }
     }
 
-    public void removeAll(Collection<E> collection) {
+    public void addAll(@NonNull Collection<E> collection, int index) {
+        if (index >= items.size()) {
+            throw new IllegalStateException("Index is defined in wrong range!");
+        } else {
+            items.addAll(index, collection);
+            notifyItemRangeInserted(calculateIndex(index, false), collection.size());
+        }
+    }
+
+    public void remove(@NonNull E item) {
+        int position = items.indexOf(item);
+        if (items.remove(item)) {
+            notifyItemRemoved(calculateIndex(position, false));
+        }
+    }
+
+    public void removeAll(@NonNull Collection<E> collection) {
         if (items.removeAll(collection)) {
             notifyDataSetChanged();
         }
     }
 
     public void remove(int index) {
-        index = calculateIndex(index);
-
-        if (items.remove(index) != null) {
-            notifyItemRemoved(index);
+        if (index >= items.size()) {
+            throw new IllegalStateException("Index is defined in wrong range!");
+        } else if (items.remove(index) != null) {
+            notifyItemRemoved(calculateIndex(index, false));
         }
     }
 
-    /**
-     * Clears current items.
-     */
-    public void clear() {
-        items.clear();
-        notifyDataSetChanged();
-    }
 
     public E get(int index) {
-        index = calculateIndex(index);
+        if (index >= items.size()) {
+            throw new IllegalStateException("Index is defined in wrong range!");
+        }
         return items.get(index);
     }
 
@@ -257,14 +257,20 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     public void set(E item, int index) {
-        index = calculateIndex(index);
-
         items.set(index, item);
-        notifyItemChanged(index);
+        notifyItemChanged(calculateIndex(index, false));
     }
 
     public void reset(Collection<E> collection) {
         reset(collection, null);
+    }
+
+    /**
+     * Clears current items.
+     */
+    public void clear() {
+        items.clear();
+        notifyDataSetChanged();
     }
 
     /**
@@ -295,18 +301,32 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Calculate the correct item index - we have to subtract the number of headers of index value as the RecyclerView doesn't distinguish
+     * Calculate the correct item index because RecyclerView doesn't distinguish
      * between header rows and item rows.
      *
-     * @param index RecyclerView row index.
+     * We have 2 possible cases, which are defined with {@param isViewBinding} value:
+     *
+     * 1. If we are trying to bind the view, than the index value has to be decremented by 1 if adapter contains header
+     * view.
+     *
+     * 2. If we are trying to perform some action on the adapter, that the index value has to be incremented by 1
+     * if adapter contains header view.
+     *
+     * @param index         RecyclerView row index.
+     * @param isViewBinding boolean value, which indicates whether we are trying to bind the view or perform some action on adapter.
      * @return correct item index.
      */
-    private int calculateIndex(int index) {
-        index = index - (hasHeader() ? 1 : 0);
+    private int calculateIndex(int index, boolean isViewBinding) {
+        if (isViewBinding) {
+            index = index - (hasHeader() ? 1 : 0);
 
-        if (index >= items.size()) {
-            throw new IllegalStateException("Index has to be defined in range from 0 to items.size() - 1!");
+            if (index >= items.size()) {
+                throw new IllegalStateException("Index is defined in wrong range!");
+            } else {
+                return index;
+            }
         } else {
+            index = index + (hasHeader() ? 1 : 0);
             return index;
         }
     }
