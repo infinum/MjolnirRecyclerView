@@ -34,4 +34,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, EmptyViewActivity.class);
         startActivity(intent);
     }
+
+    @OnClick(R.id.button_update)
+    void onUpdateViewClick() {
+        Intent intent = new Intent(this, UpdateActivity.class);
+        startActivity(intent);
+    }
 }

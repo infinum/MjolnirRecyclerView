@@ -38,7 +38,7 @@ public class UpdateActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_simple);
+        setContentView(R.layout.activity_update);
         ButterKnife.bind(this);
 
         items = new ArrayList<>();
@@ -62,6 +62,7 @@ public class UpdateActivity extends AppCompatActivity {
         newList.add(new Item(3, UUID.randomUUID().toString()));
 
         adapter.update(new ItemsDiffUtil(items, newList));
+        finish();
     }
 
     @Override
