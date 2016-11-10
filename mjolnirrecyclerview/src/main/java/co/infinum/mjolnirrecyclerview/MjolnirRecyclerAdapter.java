@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -296,7 +297,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param callback DiffUtil callback, which is used to update the items.
      */
     public void update(@NonNull DiffUtil.Callback callback) {
-        updateItemsTask = new UpdateItemsTask();
+        updateItemsTask = new UpdateItemsTask(this);
         updateItemsTask.execute(callback);
     }
 
@@ -567,6 +568,12 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     private class UpdateItemsTask extends AsyncTask<DiffUtil.Callback, Void, DiffUtil.DiffResult> {
 
+        private WeakReference<MjolnirRecyclerAdapter> adapterWeakReference;
+
+        public UpdateItemsTask(MjolnirRecyclerAdapter adapter) {
+            this.adapterWeakReference = new WeakReference<>(adapter);
+        }
+
         @Override
         protected DiffUtil.DiffResult doInBackground(DiffUtil.Callback... params) {
             if (params != null) {
@@ -579,8 +586,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         @Override
         protected void onPostExecute(DiffUtil.DiffResult diffResult) {
             super.onPostExecute(diffResult);
-            if (diffResult != null) {
-                diffResult.dispatchUpdatesTo(MjolnirRecyclerAdapter.this);
+            if (adapterWeakReference.get() != null && diffResult != null) {
+                diffResult.dispatchUpdatesTo(adapterWeakReference.get());
             }
         }
     }
