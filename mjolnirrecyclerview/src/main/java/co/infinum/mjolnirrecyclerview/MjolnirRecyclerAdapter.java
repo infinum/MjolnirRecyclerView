@@ -382,7 +382,9 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Add a footer view to this adapter. If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
+     * Add a footer view to this adapter. If layout params for the {@param footerView}} are missing, default layout params will be set with
+     * the {@link #setDefaultLayoutParams(View)} method.
+     * If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
      *
      * @param footerView    layout view
      * @param shouldReplace should we replace footer if it already exists
@@ -393,10 +395,25 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
             removeFooter();
             int position = getCollectionCount() + (hasHeader() ? 1 : 0);
             this.footerView = footerView;
+            setDefaultLayoutParams(this.footerView);
             notifyItemInserted(position);
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Sets the default layout params to the provided {@param view} if they are not yet set. Default params are MATCH_PARENT for layout
+     * width and WRAP_CONTENT for layout height.
+     *
+     * @param view View for which we want to set default layout params.
+     */
+    private void setDefaultLayoutParams(View view) {
+        if (view.getLayoutParams() == null) {
+            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
+                    RecyclerView.LayoutParams.WRAP_CONTENT);
+            view.setLayoutParams(lp);
         }
     }
 
@@ -447,8 +464,10 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Add a header view to this adapter. If header already exists, it will be replaced depending on the {@param shouldReplace} value.
+     * Add a header view to this adapter. If layout params for the {@param headerView}} are missing, default layout params will be set with
+     * the {@link #setDefaultLayoutParams(View)} method.
      *
+     * If header already exists, it will be replaced depending on the {@param shouldReplace} value.
      * @param headerView    layout view
      * @param shouldReplace should we replace header if it already exists
      * @return true if header was added/replaced, false otherwise.
@@ -457,6 +476,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         if (shouldReplace || !hasHeader()) {
             removeHeader();
             this.headerView = headerView;
+            setDefaultLayoutParams(this.headerView);
             notifyItemInserted(0);
             return true;
         } else {
