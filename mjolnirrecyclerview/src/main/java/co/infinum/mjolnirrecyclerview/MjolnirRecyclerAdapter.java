@@ -6,6 +6,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +57,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     private UpdateItemsTask updateItemsTask;
 
     protected boolean isLoading = false;
+
+    private RecyclerView.LayoutManager layoutManager;
 
     public MjolnirRecyclerAdapter(Context context, Collection<E> list) {
         this.context = context;
@@ -410,10 +413,18 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param view View for which we want to set default layout params.
      */
     private void setDefaultLayoutParams(View view) {
-        if (view.getLayoutParams() == null) {
-            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
-                    RecyclerView.LayoutParams.WRAP_CONTENT);
-            view.setLayoutParams(lp);
+        if (getLayoutManager() != null && getLayoutManager() instanceof LinearLayoutManager) {
+            RecyclerView.LayoutParams layoutParams;
+
+            if (((LinearLayoutManager) getLayoutManager()).getOrientation() == LinearLayoutManager.VERTICAL) {
+                layoutParams = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
+                        RecyclerView.LayoutParams.WRAP_CONTENT);
+                view.setLayoutParams(layoutParams);
+            } else {
+                layoutParams = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.WRAP_CONTENT,
+                        RecyclerView.LayoutParams.MATCH_PARENT);
+                view.setLayoutParams(layoutParams);
+            }
         }
     }
 
@@ -468,6 +479,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * the {@link #setDefaultLayoutParams(View)} method.
      *
      * If header already exists, it will be replaced depending on the {@param shouldReplace} value.
+     *
      * @param headerView    layout view
      * @param shouldReplace should we replace header if it already exists
      * @return true if header was added/replaced, false otherwise.
@@ -550,6 +562,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     public void setNextPageOffset(int nextPageOffset) {
         this.nextPageOffset = nextPageOffset;
+    }
+
+    public RecyclerView.LayoutManager getLayoutManager() {
+        return layoutManager;
+    }
+
+    public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
+        this.layoutManager = layoutManager;
     }
 
     // endregion
