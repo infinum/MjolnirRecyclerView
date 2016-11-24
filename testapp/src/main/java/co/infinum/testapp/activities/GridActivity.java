@@ -1,10 +1,8 @@
 package co.infinum.testapp.activities;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.widget.Toast;
 
@@ -18,7 +16,11 @@ import co.infinum.mjolnirrecyclerview.MjolnirRecyclerView;
 import co.infinum.testapp.R;
 import co.infinum.testapp.adapters.SimpleAdapter;
 
-public class SimpleActivity extends AppCompatActivity implements SimpleAdapter.OnClickListener<String> {
+/**
+ * Created by Željko Plesac on 24/11/16.
+ */
+
+public class GridActivity extends AppCompatActivity implements SimpleAdapter.OnClickListener<String> {
 
     private static final List<String> ITEMS = Collections.unmodifiableList(Arrays.asList(
             "First",
@@ -47,34 +49,18 @@ public class SimpleActivity extends AppCompatActivity implements SimpleAdapter.O
         setContentView(R.layout.activity_simple);
         ButterKnife.bind(this);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerView.setEmptyView(emptyView);
 
         adapter = new SimpleAdapter(this);
         adapter.setOnClickListener(this);
+        adapter.addAll(ITEMS);
         recyclerView.setAdapter(adapter);
 
-        adapter.addHeader(R.layout.view_header, false);
-        adapter.addFooter(R.layout.view_footer, false);
+        View footerView = getLayoutInflater().inflate(R.layout.view_footer, null);
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!isFinishing()) {
-                    adapter.addAll(ITEMS);
-                }
-            }
-        }, 5000);
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!isFinishing()) {
-                    adapter.removeFooter();
-                }
-            }
-        }, 7000);
+        adapter.addHeader(R.layout.view_header, true);
+        adapter.addFooter(footerView, false);
     }
 
     @Override
