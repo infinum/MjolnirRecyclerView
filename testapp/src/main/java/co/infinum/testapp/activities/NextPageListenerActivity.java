@@ -1,6 +1,5 @@
 package co.infinum.testapp.activities;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
