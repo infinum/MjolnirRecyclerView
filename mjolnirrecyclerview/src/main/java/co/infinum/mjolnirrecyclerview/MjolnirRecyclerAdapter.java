@@ -6,6 +6,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +57,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     private UpdateItemsTask updateItemsTask;
 
     protected boolean isLoading = false;
+
+    private RecyclerView.LayoutManager layoutManager;
 
     public MjolnirRecyclerAdapter(Context context, Collection<E> list) {
         this.context = context;
@@ -382,7 +385,9 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Add a footer view to this adapter. If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
+     * Add a footer view to this adapter. If layout params for the {@param footerView}} are missing, default layout params will be set with
+     * the {@link #setDefaultLayoutParams(View)} method.
+     * If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
      *
      * @param footerView    layout view
      * @param shouldReplace should we replace footer if it already exists
@@ -393,10 +398,33 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
             removeFooter();
             int position = getCollectionCount() + (hasHeader() ? 1 : 0);
             this.footerView = footerView;
+            setDefaultLayoutParams(this.footerView);
             notifyItemInserted(position);
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Sets the default layout params to the provided {@param view} if they are not yet set. Default params are MATCH_PARENT for layout
+     * width and WRAP_CONTENT for layout height.
+     *
+     * @param view View for which we want to set default layout params.
+     */
+    private void setDefaultLayoutParams(View view) {
+        if (getLayoutManager() != null && getLayoutManager() instanceof LinearLayoutManager) {
+            RecyclerView.LayoutParams layoutParams;
+
+            if (((LinearLayoutManager) getLayoutManager()).getOrientation() == LinearLayoutManager.VERTICAL) {
+                layoutParams = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
+                        RecyclerView.LayoutParams.WRAP_CONTENT);
+                view.setLayoutParams(layoutParams);
+            } else {
+                layoutParams = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.WRAP_CONTENT,
+                        RecyclerView.LayoutParams.MATCH_PARENT);
+                view.setLayoutParams(layoutParams);
+            }
         }
     }
 
@@ -447,7 +475,10 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Add a header view to this adapter. If header already exists, it will be replaced depending on the {@param shouldReplace} value.
+     * Add a header view to this adapter. If layout params for the {@param headerView}} are missing, default layout params will be set with
+     * the {@link #setDefaultLayoutParams(View)} method.
+     *
+     * If header already exists, it will be replaced depending on the {@param shouldReplace} value.
      *
      * @param headerView    layout view
      * @param shouldReplace should we replace header if it already exists
@@ -457,6 +488,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         if (shouldReplace || !hasHeader()) {
             removeHeader();
             this.headerView = headerView;
+            setDefaultLayoutParams(this.headerView);
             notifyItemInserted(0);
             return true;
         } else {
@@ -530,6 +562,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     public void setNextPageOffset(int nextPageOffset) {
         this.nextPageOffset = nextPageOffset;
+    }
+
+    public RecyclerView.LayoutManager getLayoutManager() {
+        return layoutManager;
+    }
+
+    public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
+        this.layoutManager = layoutManager;
     }
 
     // endregion

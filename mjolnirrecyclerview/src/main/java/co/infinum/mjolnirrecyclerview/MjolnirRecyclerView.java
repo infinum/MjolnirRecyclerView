@@ -72,6 +72,16 @@ public class MjolnirRecyclerView extends RecyclerView {
         }
     }
 
+    @Override
+    public void setLayoutManager(LayoutManager layout) {
+        super.setLayoutManager(layout);
+
+        if (getAdapter() != null && getAdapter() instanceof MjolnirRecyclerAdapter
+                && ((MjolnirRecyclerAdapter) getAdapter()).getLayoutManager() == null) {
+            ((MjolnirRecyclerAdapter) getAdapter()).setLayoutManager(getLayoutManager());
+        }
+    }
+
     /**
      * Sets the RecyclerView's adapter and registers adapter data observer, which is used to update empty view's visibility and loading
      * state of the adapter.
@@ -85,6 +95,10 @@ public class MjolnirRecyclerView extends RecyclerView {
         super.setAdapter(adapter);
         if (adapter != null) {
             adapter.registerAdapterDataObserver(observer);
+        }
+
+        if (adapter instanceof MjolnirRecyclerAdapter && ((MjolnirRecyclerAdapter) getAdapter()).getLayoutManager() == null) {
+            ((MjolnirRecyclerAdapter) getAdapter()).setLayoutManager(getLayoutManager());
         }
 
         checkIfEmpty();
