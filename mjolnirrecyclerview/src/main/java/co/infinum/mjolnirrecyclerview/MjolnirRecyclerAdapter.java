@@ -6,6 +6,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -335,6 +336,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         }
     }
 
+    // region Headers and Footers
+
     /**
      * Add a footer to this adapter.
      * This method has higher priority than {@link #addFooter(android.view.View)}.
@@ -570,12 +573,34 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
         this.layoutManager = layoutManager;
+
+        // if layout manager is GridLayoutManager, we have to attach span size lookup in order to correctly setup header and footer view
+        if (layoutManager instanceof GridLayoutManager) {
+            setHeaderFooterViewsForGridLayoutManager((GridLayoutManager) layoutManager);
+        }
+    }
+
+    /**
+     * If adapter is using GridLayoutManager, we have to register custom SpanSizeLookup listener and manipulate with span size - if current
+     * item is either header or footer, we return {@param layoutManager} span count as span size in order to position header or footer view
+     * in it's own column.
+     *
+     * @param layoutManager GridLayoutManager for which we attach SpanSizeLookup listener.
+     */
+    private void setHeaderFooterViewsForGridLayoutManager(final GridLayoutManager layoutManager) {
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (isHeader(position) || isFooter(position)) {
+                    return layoutManager.getSpanCount();
+                } else {
+                    return 1;
+                }
+            }
+        });
     }
 
     // endregion
-
-    // region Headers and Footers
-
 
     /**
      * @param position current adapter position

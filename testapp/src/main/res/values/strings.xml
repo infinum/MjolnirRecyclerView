@@ -5,6 +5,7 @@
     <string name="header">Example header</string>
     <string name="simple_example">Simple example</string>
     <string name="example_update">Example update</string>
+    <string name="grid_example">Grid example</string>
     <string name="update_content">Update content</string>
     <string name="loading">Loading...</string>
     <string name="example_scroll">Example next page listener</string>

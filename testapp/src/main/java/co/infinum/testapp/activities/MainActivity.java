@@ -40,4 +40,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, UpdateActivity.class);
         startActivity(intent);
     }
+
+    @OnClick(R.id.button_grid)
+    void onGridExampleClick() {
+        Intent intent = new Intent(this, GridActivity.class);
+        startActivity(intent);
+    }
 }
