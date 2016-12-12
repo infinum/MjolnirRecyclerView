@@ -70,7 +70,7 @@ public class SimpleActivity extends AppCompatActivity implements SimpleAdapter.O
             @Override
             public void run() {
                 if (!isFinishing()) {
-                    adapter.removeFooter();
+                    adapter.addHeader(R.layout.view_footer, true);
                 }
             }
         }, 7000);

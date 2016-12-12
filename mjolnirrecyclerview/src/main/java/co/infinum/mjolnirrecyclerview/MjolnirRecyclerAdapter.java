@@ -45,10 +45,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     private List<E> items;
 
-    private int footerViewId;
-
-    private int headerViewId;
-
     private int nextPageOffset = 1;
 
     private View footerView;
@@ -68,14 +64,13 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         // Check if we have to inflate ItemViewHolder of HeaderFooterHolder
         if (viewType == TYPE_ITEM) {
             return onCreateItemViewHolder(parent, viewType);
         } else if (viewType == TYPE_HEADER) {
-            return onCreateHeaderViewHolder(headerViewId, parent);
+            return onCreateHeaderViewHolder();
         } else if (viewType == TYPE_FOOTER) {
-            return onCreateFooterViewHolder(footerViewId, parent);
+            return onCreateFooterViewHolder();
         }
 
         return null;
@@ -84,21 +79,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     /**
      * Override if you need a custom implementation.
      */
-    protected ViewHolder onCreateFooterViewHolder(int footerViewId, ViewGroup parent) {
-        if (footerView == null) {
-            footerView = LayoutInflater.from(getContext()).inflate(footerViewId, parent, false);
-        }
+    protected ViewHolder onCreateFooterViewHolder() {
         return new HeaderFooterViewHolder(footerView);
-
     }
 
     /**
      * Override if you need a custom implementation.
      */
-    protected ViewHolder onCreateHeaderViewHolder(int headerViewId, ViewGroup parent) {
-        if (headerView == null) {
-            headerView = LayoutInflater.from(getContext()).inflate(headerViewId, parent, false);
-        }
+    protected ViewHolder onCreateHeaderViewHolder() {
         return new HeaderFooterViewHolder(headerView);
 
     }
@@ -349,7 +337,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     @Deprecated
     public void addFooter(@LayoutRes int footerViewId) {
         int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-        this.footerViewId = footerViewId;
+        footerView = LayoutInflater.from(getContext()).inflate(footerViewId, null, false);
+        setDefaultLayoutParams(footerView);
         notifyItemInserted(position);
     }
 
@@ -364,7 +353,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         if (shouldReplace || !hasFooter()) {
             removeFooter();
             int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-            this.footerViewId = footerViewId;
+            footerView = LayoutInflater.from(getContext()).inflate(footerViewId, null, false);
+            setDefaultLayoutParams(footerView);
             notifyItemInserted(position);
             return true;
         } else {
@@ -384,6 +374,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     public void addFooter(View footerView) {
         int position = getCollectionCount() + (hasHeader() ? 1 : 0);
         this.footerView = footerView;
+        setDefaultLayoutParams(footerView);
         notifyItemInserted(position);
     }
 
@@ -441,7 +432,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      */
     @Deprecated
     public void addHeader(@LayoutRes int headerViewId) {
-        this.headerViewId = headerViewId;
+        headerView = LayoutInflater.from(getContext()).inflate(headerViewId, null, false);
+        setDefaultLayoutParams(headerView);
         notifyItemInserted(0);
     }
 
@@ -455,7 +447,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     public boolean addHeader(@LayoutRes int headerViewId, boolean shouldReplace) {
         if (shouldReplace || !hasHeader()) {
             removeHeader();
-            this.headerViewId = headerViewId;
+            headerView = LayoutInflater.from(getContext()).inflate(headerViewId, null, false);
+            setDefaultLayoutParams(headerView);
             notifyItemInserted(0);
             return true;
         } else {
@@ -474,6 +467,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     @Deprecated
     public void addHeader(View headerView) {
         this.headerView = headerView;
+        setDefaultLayoutParams(headerView);
         notifyItemInserted(0);
     }
 
@@ -505,7 +499,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     public void removeHeader() {
         if (hasHeader()) {
             headerView = null;
-            headerViewId = 0;
             notifyItemRemoved(0);
         }
     }
@@ -516,7 +509,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     public void removeFooter() {
         if (hasFooter()) {
             footerView = null;
-            footerViewId = 0;
 
             int position = getCollectionCount() + (hasHeader() ? 1 : 0);
             notifyItemRemoved(position);
@@ -524,17 +516,17 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * @return true if {@param footerViewId} is not 0 or if {@param footerView} is not null, false otherwise
+     * @return true if {@param footerView} is not null, false otherwise
      */
     private boolean hasFooter() {
-        return footerViewId != 0 || footerView != null;
+        return footerView != null;
     }
 
     /**
-     * @return true if {@param headerViewId} is not 0 or if {@param headerView} is not null, false otherwise
+     * @return true if {@param headerView} is not null, false otherwise
      */
     private boolean hasHeader() {
-        return headerViewId != 0 || headerView != null;
+        return headerView != null;
     }
 
     /**
