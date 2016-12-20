@@ -30,7 +30,7 @@ test:
     # build the project and run static analysis while we wait for the emulator to boot (lint, pmd, findbugs, checkstyle)
     - ./gradlew assembleDebug -PdisablePreDex
     # run static analysis
-    - ./gradlew checkstyle pmd findbugs -PdisablePreDex
+    - ./gradlew lint checkstyle pmd findbugs -PdisablePreDex
   post:
     # copy the build outputs to artifacts
     - cp -r mjolnirrecyclerview/build/reports $CIRCLE_ARTIFACTS
