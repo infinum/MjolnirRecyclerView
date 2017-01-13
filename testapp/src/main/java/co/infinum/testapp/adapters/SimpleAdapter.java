@@ -12,6 +12,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import co.infinum.mjolnirrecyclerview.MjolnirRecyclerAdapter;
+import co.infinum.mjolnirrecyclerview.MjolnirViewHolder;
 import co.infinum.testapp.R;
 
 /**
@@ -24,12 +25,22 @@ public class SimpleAdapter extends MjolnirRecyclerAdapter<String> {
     }
 
     @Override
-    protected MjolnirRecyclerAdapter<String>.ViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType) {
+    protected MjolnirViewHolder<String> onCreateItemViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_adapter, parent, false);
-        return new ViewHolder(view);
+        return new TestViewHolder(view);
     }
 
-    public class ViewHolder extends MjolnirRecyclerAdapter<String>.ViewHolder {
+    @Override
+    public void onBindViewHolder(MjolnirViewHolder holder, int position) {
+        super.onBindViewHolder(holder, position);
+    }
+
+    @Override
+    public void onBindViewHolder(MjolnirViewHolder holder, int position, List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
+    }
+
+    public class TestViewHolder extends MjolnirViewHolder<String> {
 
         @BindView(R.id.tv_position)
         TextView tvPosition;
@@ -40,7 +51,7 @@ public class SimpleAdapter extends MjolnirRecyclerAdapter<String> {
         @BindView(R.id.root_view)
         View rootView;
 
-        public ViewHolder(View itemView) {
+        public TestViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

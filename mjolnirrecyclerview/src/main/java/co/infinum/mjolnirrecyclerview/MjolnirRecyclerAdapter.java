@@ -29,7 +29,7 @@ import java.util.List;
  * <p>
  * Created by Željko Plesac on 27/09/16.
  */
-public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<MjolnirRecyclerAdapter.ViewHolder> {
+public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<MjolnirViewHolder> {
 
     public static final int TYPE_HEADER = 111;
 
@@ -63,7 +63,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MjolnirViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // Check if we have to inflate ItemViewHolder of HeaderFooterHolder
         if (viewType == TYPE_ITEM) {
             return onCreateItemViewHolder(parent, viewType);
@@ -79,27 +79,27 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     /**
      * Override if you need a custom implementation.
      */
-    protected ViewHolder onCreateFooterViewHolder() {
-        return new HeaderFooterViewHolder(footerView);
+    protected MjolnirViewHolder onCreateFooterViewHolder() {
+        return new MjolnirHeaderFooterView(footerView);
     }
 
     /**
      * Override if you need a custom implementation.
      */
-    protected ViewHolder onCreateHeaderViewHolder() {
-        return new HeaderFooterViewHolder(headerView);
+    protected MjolnirViewHolder onCreateHeaderViewHolder() {
+        return new MjolnirHeaderFooterView(headerView);
 
     }
 
-    protected abstract ViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType);
+    protected abstract MjolnirViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType);
 
     @Override
-    public void onBindViewHolder(MjolnirRecyclerAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(MjolnirViewHolder holder, int position) {
         onBindViewHolder(holder, position, Collections.emptyList());
     }
 
     @Override
-    public void onBindViewHolder(MjolnirRecyclerAdapter.ViewHolder holder, int position, List<Object> payloads) {
+    public void onBindViewHolder(MjolnirViewHolder holder, int position, List<Object> payloads) {
 
         //check what type of view our position is
         switch (getItemViewType(position)) {
@@ -236,7 +236,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
             notifyItemRemoved(calculateIndex(index, false));
         }
     }
-
 
     public E get(int index) {
         if (index >= items.size()) {
@@ -610,7 +609,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         return TYPE_ITEM;
     }
 
-
     public interface OnClickListener<E> {
 
         void onClick(int index, E item);
@@ -647,25 +645,5 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                 diffResult.dispatchUpdatesTo(adapterWeakReference.get());
             }
         }
-    }
-
-    public class HeaderFooterViewHolder extends ViewHolder {
-
-        public HeaderFooterViewHolder(View itemView) {
-            super(itemView);
-        }
-
-        @Override
-        protected void bind(E item, int position, List<Object> payloads) {
-        }
-    }
-
-    public abstract class ViewHolder extends RecyclerView.ViewHolder {
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-        }
-
-        protected abstract void bind(E item, int position, List<Object> payloads);
     }
 }
