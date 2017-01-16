@@ -4,9 +4,9 @@ import android.view.View;
 
 import java.util.List;
 
-public class MjolnirHeaderFooterView<E> extends MjolnirViewHolder<E> {
+public class MjolnirHeaderFooterViewHolder<E> extends MjolnirViewHolder<E> {
 
-    public MjolnirHeaderFooterView(View itemView) {
+    public MjolnirHeaderFooterViewHolder(View itemView) {
         super(itemView);
     }
 

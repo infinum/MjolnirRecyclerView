@@ -80,14 +80,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Override if you need a custom implementation.
      */
     protected MjolnirViewHolder onCreateFooterViewHolder() {
-        return new MjolnirHeaderFooterView(footerView);
+        return new MjolnirHeaderFooterViewHolder(footerView);
     }
 
     /**
      * Override if you need a custom implementation.
      */
     protected MjolnirViewHolder onCreateHeaderViewHolder() {
-        return new MjolnirHeaderFooterView(headerView);
+        return new MjolnirHeaderFooterViewHolder(headerView);
 
     }
 
