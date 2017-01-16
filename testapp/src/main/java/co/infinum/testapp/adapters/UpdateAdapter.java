@@ -13,6 +13,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import co.infinum.mjolnirrecyclerview.MjolnirRecyclerAdapter;
+import co.infinum.mjolnirrecyclerview.MjolnirViewHolder;
 import co.infinum.testapp.R;
 import co.infinum.testapp.diffutils.ItemsDiffUtil;
 import co.infinum.testapp.models.Item;
@@ -28,12 +29,12 @@ public class UpdateAdapter extends MjolnirRecyclerAdapter<Item> {
     }
 
     @Override
-    protected MjolnirRecyclerAdapter<Item>.ViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType) {
+    protected MjolnirViewHolder<Item> onCreateItemViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_adapter, parent, false);
         return new ViewHolder(view);
     }
 
-    public class ViewHolder extends MjolnirRecyclerAdapter<Item>.ViewHolder {
+    public class ViewHolder extends MjolnirViewHolder<Item> {
 
         @BindView(R.id.tv_position)
         TextView tvPosition;
