@@ -517,14 +517,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     /**
      * @return true if {@param footerView} is not null, false otherwise
      */
-    private boolean hasFooter() {
+    public boolean hasFooter() {
         return footerView != null;
     }
 
     /**
      * @return true if {@param headerView} is not null, false otherwise
      */
-    private boolean hasHeader() {
+    public boolean hasHeader() {
         return headerView != null;
     }
 
