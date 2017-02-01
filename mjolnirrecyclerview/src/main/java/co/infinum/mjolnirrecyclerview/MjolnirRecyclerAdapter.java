@@ -621,7 +621,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     // endregion
 
-    private class UpdateItemsTask extends AsyncTask<DiffUtil.Callback, Void, DiffUtil.DiffResult> {
+    static class UpdateItemsTask extends AsyncTask<DiffUtil.Callback, Void, DiffUtil.DiffResult> {
 
         private WeakReference<MjolnirRecyclerAdapter> adapterWeakReference;
 
