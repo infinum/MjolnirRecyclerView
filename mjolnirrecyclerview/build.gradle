@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 9
-        versionName "1.5.1"
+        versionCode 10
+        versionName "1.6.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -45,7 +45,7 @@ ext {
     siteUrl = 'https://github.com/infinum/MjolnirRecyclerView'
     gitUrl = 'https://github.com/infinum/MjolnirRecyclerView.git'
 
-    libraryVersion = '1.5.1'
+    libraryVersion = '1.6.0'
 
     developerId = 'zplesac'
     developerName = 'Zeljko Plesac'
