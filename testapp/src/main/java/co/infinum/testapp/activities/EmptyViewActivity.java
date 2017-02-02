@@ -16,10 +16,6 @@ import co.infinum.mjolnirrecyclerview.MjolnirRecyclerView;
 import co.infinum.testapp.R;
 import co.infinum.testapp.adapters.SimpleAdapter;
 
-/**
- * Created by Željko Plesac on 04/11/16.
- */
-
 public class EmptyViewActivity extends AppCompatActivity {
 
     private static final List<String> ITEMS = Collections.unmodifiableList(Arrays.asList(
@@ -41,9 +37,6 @@ public class EmptyViewActivity extends AppCompatActivity {
     @BindView(R.id.empty_view)
     View emptyView;
 
-    @BindView(R.id.button_update)
-    View buttonUpdate;
-
     private SimpleAdapter adapter;
 
     @Override
@@ -51,8 +44,6 @@ public class EmptyViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple);
         ButterKnife.bind(this);
-
-        buttonUpdate.setVisibility(View.GONE);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setEmptyView(emptyView, true);
