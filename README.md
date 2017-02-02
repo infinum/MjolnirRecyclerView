@@ -38,16 +38,29 @@ Empty view support for [MjolnirRecyclerView](https://github.com/infinum/MjolnirR
     recyclerView.setEmptyView(View view)
 ```  
  
- 
+You can also show empty view while adapter is not set to the MjolnirRecyclerView, which is handy if you want to intialize adapter at some later point in the time.
+
+```java  
+    // show empty view if adapter is not set
+    recyclerView.setEmptyView(View view, true)
+```   
 ### 3. DiffUtil
 
-DiffUtil support for [MjolnirRecyclerAdapter](https://github.com/infinum/MjolnirRecyclerView/blob/master/mjolnirrecyclerview/src/main/java/co/infinum/mjolnirrecyclerview/MjolnirRecyclerAdapter.java). Simply add [DiffUtil.Callback](https://developer.android.com/reference/android/support/v7/util/DiffUtil.Callback.html) in adapters reset method:
+DiffUtil support for [MjolnirRecyclerAdapter](https://github.com/infinum/MjolnirRecyclerView/blob/master/mjolnirrecyclerview/src/main/java/co/infinum/mjolnirrecyclerview/MjolnirRecyclerAdapter.java). Simply add [DiffUtil.Callback](https://developer.android.com/reference/android/support/v7/util/DiffUtil.Callback.html) in adapters update method:
 
 ```java
-    adapter.reset(items, new ItemDiffUtilResult())
+    adapter.update(new ItemDiffUtilResult())
 ```    
 
 As [DiffUtil](https://developer.android.com/reference/android/support/v7/util/DiffUtil.html) is a blocking sync action, it's executed on the background thread inside the  [MjolnirRecyclerAdapter](https://github.com/infinum/MjolnirRecyclerView/blob/master/mjolnirrecyclerview/src/main/java/co/infinum/mjolnirrecyclerview/MjolnirRecyclerAdapter.java) by using a [AsyncTask](https://developer.android.com/reference/android/os/AsyncTask.html). As a result of this approach, you need to call [cancel()](https://github.com/infinum/MjolnirRecyclerView/blob/master/mjolnirrecyclerview/src/main/java/co/infinum/mjolnirrecyclerview/MjolnirRecyclerAdapter.java#L126) method on your adapter when your activity or fragment is about to be destroyed, so that the adapter is not updated if the screen has been destroyed.
+
+```java
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        adapter.cancel();
+    }
+``` 
 
 ### 4. ArrayAdapter like methods
 
