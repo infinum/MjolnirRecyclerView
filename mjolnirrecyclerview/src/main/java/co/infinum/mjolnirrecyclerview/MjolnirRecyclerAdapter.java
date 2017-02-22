@@ -65,15 +65,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     @Override
     public MjolnirViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // Check if we have to inflate ItemViewHolder of HeaderFooterHolder
-        if (viewType == TYPE_ITEM) {
-            return onCreateItemViewHolder(parent, viewType);
-        } else if (viewType == TYPE_HEADER) {
-            return onCreateHeaderViewHolder();
-        } else if (viewType == TYPE_FOOTER) {
-            return onCreateFooterViewHolder();
+        switch (viewType) {
+            case TYPE_HEADER:
+                return onCreateHeaderViewHolder();
+            case TYPE_FOOTER:
+                return onCreateFooterViewHolder();
+            default:
+                return onCreateItemViewHolder(parent, viewType);
         }
-
-        return null;
     }
 
     /**
@@ -103,7 +102,11 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
         //check what type of view our position is
         switch (getItemViewType(position)) {
-            case TYPE_ITEM:
+            case TYPE_HEADER:
+            case TYPE_FOOTER:
+                //Nothing, for now.
+                break;
+            default:
                 position = calculateIndex(position, true);
                 E item = items.get(position);
                 holder.bind(item, position, payloads);
@@ -113,9 +116,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                     isLoading = true;
                     nextPageListener.onScrolledToNextPage();
                 }
-                break;
-            default:
-                //Nothing, for now.
                 break;
         }
     }
@@ -599,7 +599,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      */
     @Override
     public int getItemViewType(int position) {
-
         //check what type our position is, based on the assumption that the order is headers > items > footers
         if (isHeader(position)) {
             return TYPE_HEADER;
