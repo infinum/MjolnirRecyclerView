@@ -605,8 +605,20 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         } else if (isFooter(position)) {
             return TYPE_FOOTER;
         }
+
+        return getCustomItemViewType(position);
+    }
+
+    /**
+     * +     * Override this method if you are using custom ItemViewType and provide correct implementation.
+     * +     * @param position
+     * +     * @return
+     * +
+     */
+    protected int getCustomItemViewType(int position) {
         return TYPE_ITEM;
     }
+
 
     public interface OnClickListener<E> {
 
