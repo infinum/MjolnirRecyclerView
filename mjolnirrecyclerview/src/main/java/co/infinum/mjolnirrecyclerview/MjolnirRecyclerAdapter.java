@@ -606,16 +606,16 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
             return TYPE_FOOTER;
         }
 
-        return getCustomItemViewType(position);
+        return getAdditionalItemViewType(position);
     }
 
     /**
-     * +     * Override this method if you are using custom ItemViewType and provide correct implementation.
-     * +     * @param position
-     * +     * @return
+     * Override this method if you are using custom ItemViewType and provide correct implementation.
+     * @param position
+     * @return
      * +
      */
-    protected int getCustomItemViewType(int position) {
+    protected int getAdditionalItemViewType(int position) {
         return TYPE_ITEM;
     }
 
