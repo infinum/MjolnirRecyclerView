@@ -1,7 +1,8 @@
 package co.infinum.mjolnirrecyclerview;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,11 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.lang.ref.WeakReference;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Custom implementation of RecyclerView.Adapter, which has following features:
@@ -51,9 +55,15 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     private View headerView;
 
-    private UpdateItemsTask updateItemsTask;
+    private Handler handler = new Handler(Looper.getMainLooper());
+
+    protected boolean isCancelled = false;
 
     protected boolean isLoading = false;
+
+    protected Queue<Collection<E>> pendingUpdates = new ArrayDeque<>();
+
+    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private RecyclerView.LayoutManager layoutManager;
 
@@ -167,13 +177,18 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Cancels the UpdateItems AsyncTask, so that we don't perform any UI updates. This method must be called when your activity
-     * or fragment is about to be destroyed, so that we don't risk any UI exceptions.
+     * Sets the isCancelled flag to true, which will cancel DiffUtil.DiffResult update dispatch to the adapter. Call this method when
+     * your activity or fragment is about to be destroyed.
      */
     public void cancel() {
-        if (updateItemsTask != null) {
-            updateItemsTask.cancel(true);
-        }
+        isCancelled = true;
+    }
+
+    /**
+     * Sets the isCancelled flag to false, which will enable DiffUtil.DiffResult update dispatch to the adapter.
+     */
+    public void reset() {
+        isCancelled = false;
     }
 
     public boolean isLoading() {
@@ -253,10 +268,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         notifyItemChanged(calculateIndex(index, false));
     }
 
-    public void reset(Collection<E> collection) {
-        reset(collection, null);
-    }
-
     /**
      * Clears current items.
      */
@@ -266,30 +277,23 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Resets the current adapter state - clear current items, add new ones and execute UpdateItems task.
+     * Update the current adapter state. If {@param callback} is provided, an updated data set is calculated with DiffUtil, otherwise
+     * current data set is clear and {@param newItems} are added to the internal items collection.
      *
-     * @param collection Collection of new items, which are added to adapter.
-     * @param callback   DiffUtil callback, which is used to update the items.
-     */
-    public void reset(Collection<E> collection, @Nullable DiffUtil.Callback callback) {
-        items.clear();
-        items.addAll(collection);
-        if (callback != null) {
-            update(callback);
-        } else {
-            notifyDataSetChanged();
-        }
-    }
-
-    /**
-     * Update current adapter state by executing UpdateItems, which will execute UpdateItems task with {@param callback} as
-     * input parameter.
-     *
+     * @param newItems Collection of new items, which are added to adapter.
      * @param callback DiffUtil callback, which is used to update the items.
      */
-    public void update(@NonNull DiffUtil.Callback callback) {
-        updateItemsTask = new UpdateItemsTask(this);
-        updateItemsTask.execute(callback);
+    public void update(Collection<E> newItems, @Nullable DiffUtil.Callback callback) {
+        if (callback != null) {
+            pendingUpdates.add(newItems);
+            if (pendingUpdates.size() == 1) {
+                updateData(newItems, callback);
+            }
+        } else {
+            items.clear();
+            items.addAll(newItems);
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -632,29 +636,45 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     // endregion
 
-    static class UpdateItemsTask extends AsyncTask<DiffUtil.Callback, Void, DiffUtil.DiffResult> {
-
-        private WeakReference<MjolnirRecyclerAdapter> adapterWeakReference;
-
-        public UpdateItemsTask(MjolnirRecyclerAdapter adapter) {
-            this.adapterWeakReference = new WeakReference<>(adapter);
-        }
-
-        @Override
-        protected DiffUtil.DiffResult doInBackground(DiffUtil.Callback... params) {
-            if (params != null) {
-                return DiffUtil.calculateDiff(params[0]);
-            } else {
-                return null;
+    /**
+     * Calculates provided {@param callback} DiffResult by using DiffUtils.
+     *
+     * @param newItems Collection of new items, with which our current items collection is updated.
+     * @param callback DiffUtil.Callback on which DiffResult is calculated.
+     */
+    private void updateData(final Collection<E> newItems, final DiffUtil.Callback callback) {
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
+                postDiffResults(newItems, diffResult, callback);
             }
-        }
+        });
+    }
 
-        @Override
-        protected void onPostExecute(DiffUtil.DiffResult diffResult) {
-            super.onPostExecute(diffResult);
-            if (adapterWeakReference.get() != null && diffResult != null) {
-                diffResult.dispatchUpdatesTo(adapterWeakReference.get());
-            }
+    /**
+     * Dispatched {@param diffResult} DiffResults to the adapter if adapter has not been cancelled. If there are any queued pending updates,
+     * it will peek the latest new items collection and once again update the adapter content.
+     *
+     * @param newItems   Collection of new items, with which our current items collection is updated.
+     * @param diffResult DiffUtil.DiffResult which was calculated for {@param callback}.
+     * @param callback   DiffUtil.Callback on which DiffResult was calculated.
+     */
+    private void postDiffResults(final Collection<E> newItems, final DiffUtil.DiffResult diffResult, final DiffUtil.Callback callback) {
+        if (!isCancelled) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    pendingUpdates.remove();
+                    diffResult.dispatchUpdatesTo(MjolnirRecyclerAdapter.this);
+                    items.clear();
+                    items.addAll(newItems);
+
+                    if (pendingUpdates.size() > 0) {
+                        updateData(pendingUpdates.peek(), callback);
+                    }
+                }
+            });
         }
     }
 }

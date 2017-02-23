@@ -61,7 +61,7 @@ public class UpdateActivity extends AppCompatActivity {
         newList.add(new Item(2, "Plane"));
         newList.add(new Item(3, UUID.randomUUID().toString()));
 
-        adapter.update(new ItemsDiffUtil(items, newList));
+        adapter.update(newList, new ItemsDiffUtil(items, newList));
     }
 
     @Override
