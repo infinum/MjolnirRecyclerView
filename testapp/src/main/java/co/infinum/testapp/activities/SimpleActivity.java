@@ -51,11 +51,11 @@ public class SimpleActivity extends AppCompatActivity implements SimpleAdapter.O
 
         adapter = new SimpleAdapter(this);
         adapter.setOnClickListener(this);
-        recyclerView.setAdapter(adapter);
 
         adapter.addHeader(R.layout.view_header, false);
         adapter.addFooter(R.layout.view_footer, false);
 
+        recyclerView.setAdapter(adapter);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
