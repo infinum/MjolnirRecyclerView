@@ -330,29 +330,13 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     // region Headers and Footers
 
     /**
-     * Add a footer to this adapter.
-     * This method has higher priority than {@link #addFooter(android.view.View)}.
-     *
-     * Deprecated in version 1.1.0, use  {@link #addFooter(int footerViewId, boolean shouldReplace)  instead.
-     *
-     * @param footerViewId layout resource id
-     */
-    @Deprecated
-    public void addFooter(@LayoutRes int footerViewId) {
-        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-        footerView = LayoutInflater.from(getContext()).inflate(footerViewId, null, false);
-        setDefaultLayoutParams(footerView);
-        notifyItemInserted(position);
-    }
-
-    /**
      * Add a footer view to this adapter. If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
      *
      * @param footerViewId  layout view id.
      * @param shouldReplace should we replace footer if it already exists
      * @return true if footer was added/replaced, false otherwise.
      */
-    public boolean addFooter(@LayoutRes int footerViewId, boolean shouldReplace) {
+    public boolean setFooter(@LayoutRes int footerViewId, boolean shouldReplace) {
         if (shouldReplace || !hasFooter()) {
             removeFooter();
             int position = getCollectionCount() + (hasHeader() ? 1 : 0);
@@ -366,22 +350,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Add a footer view to this adapter.
-     * This method has lower priority than {@link #addFooter(int)}.
-     *
-     * Deprecated in version 1.1.0, use  {@link #addFooter(View headerView, boolean shouldReplace)} instead.
-     *
-     * @param footerView layout view
-     */
-    @Deprecated
-    public void addFooter(View footerView) {
-        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-        this.footerView = footerView;
-        setDefaultLayoutParams(footerView);
-        notifyItemInserted(position);
-    }
-
-    /**
      * Add a footer view to this adapter. If layout params for the {@param footerView}} are missing, default layout params will be set with
      * the {@link #setDefaultLayoutParams(View)} method.
      * If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
@@ -390,7 +358,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param shouldReplace should we replace footer if it already exists
      * @return true if footer was added/replaced, false otherwise.
      */
-    public boolean addFooter(View footerView, boolean shouldReplace) {
+    public boolean setFooter(View footerView, boolean shouldReplace) {
         if (shouldReplace || !hasFooter()) {
             removeFooter();
             int position = getCollectionCount() + (hasHeader() ? 1 : 0);
@@ -426,28 +394,13 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Add a header to this adapter.
-     * This method has higher priority than {@link #addHeader(android.view.View)}.
-     *
-     * Deprecated in version 1.1.0, use  {@link #addHeader(int headerViewId, boolean shouldReplace)} instead.
-     *
-     * @param headerViewId layout resource id
-     */
-    @Deprecated
-    public void addHeader(@LayoutRes int headerViewId) {
-        headerView = LayoutInflater.from(getContext()).inflate(headerViewId, null, false);
-        setDefaultLayoutParams(headerView);
-        notifyItemInserted(0);
-    }
-
-    /**
      * Add a header view to this adapter. If header already exists, it will be replaced depending on the {@param shouldReplace} value.
      *
      * @param headerViewId  layout view id.
      * @param shouldReplace should we replace header if it already exists
      * @return true if header was added/replaced, false otherwise.
      */
-    public boolean addHeader(@LayoutRes int headerViewId, boolean shouldReplace) {
+    public boolean setHeader(@LayoutRes int headerViewId, boolean shouldReplace) {
         if (shouldReplace || !hasHeader()) {
             removeHeader();
             headerView = LayoutInflater.from(getContext()).inflate(headerViewId, null, false);
@@ -460,21 +413,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Add a header view to this adapter.
-     * This method has lower priority than {@link #addHeader(int)}.
-     *
-     * Deprecated in version 1.1.0, use  {@link #addHeader(View headerView, boolean shouldReplace)} instead.
-     *
-     * @param headerView layout view
-     */
-    @Deprecated
-    public void addHeader(View headerView) {
-        this.headerView = headerView;
-        setDefaultLayoutParams(headerView);
-        notifyItemInserted(0);
-    }
-
-    /**
      * Add a header view to this adapter. If layout params for the {@param headerView}} are missing, default layout params will be set with
      * the {@link #setDefaultLayoutParams(View)} method.
      *
@@ -484,7 +422,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param shouldReplace should we replace header if it already exists
      * @return true if header was added/replaced, false otherwise.
      */
-    public boolean addHeader(View headerView, boolean shouldReplace) {
+    public boolean setHeader(View headerView, boolean shouldReplace) {
         if (shouldReplace || !hasHeader()) {
             removeHeader();
             this.headerView = headerView;
@@ -615,9 +553,8 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Override this method if you are using custom ItemViewType and provide correct implementation.
-     * @param position
-     * @return
-     * +
+     *
+     * @return +
      */
     protected int getAdditionalItemViewType(int position) {
         return TYPE_ITEM;

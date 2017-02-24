@@ -59,8 +59,8 @@ public class GridActivity extends AppCompatActivity implements SimpleAdapter.OnC
 
         View footerView = getLayoutInflater().inflate(R.layout.view_footer, null);
 
-        adapter.addHeader(R.layout.view_header, true);
-        adapter.addFooter(footerView, false);
+        adapter.setHeader(R.layout.view_header, true);
+        adapter.setFooter(footerView, false);
     }
 
     @Override
