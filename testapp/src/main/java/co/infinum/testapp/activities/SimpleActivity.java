@@ -53,8 +53,8 @@ public class SimpleActivity extends AppCompatActivity implements SimpleAdapter.O
         adapter.setOnClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        adapter.addHeader(R.layout.view_header, false);
-        adapter.addFooter(R.layout.view_footer, false);
+        adapter.setHeader(R.layout.view_header);
+        adapter.setFooter(R.layout.view_footer);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -65,15 +65,6 @@ public class SimpleActivity extends AppCompatActivity implements SimpleAdapter.O
                 }
             }
         }, 5000);
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!isFinishing()) {
-                    adapter.addHeader(R.layout.view_footer, true);
-                }
-            }
-        }, 7000);
     }
 
     @Override
