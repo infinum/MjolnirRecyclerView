@@ -335,17 +335,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param footerViewId layout view id.
      */
     public void setFooter(@LayoutRes int footerViewId) {
-        boolean hadFooterBefore = hasFooter();
-
-        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-        footerView = LayoutInflater.from(getContext()).inflate(footerViewId, null, false);
-        setDefaultLayoutParams(footerView);
-
-        if (hadFooterBefore) {
-            notifyItemChanged(position);
-        } else {
-            notifyItemInserted(position);
-        }
+        setFooter(LayoutInflater.from(getContext()).inflate(footerViewId, null, false));
     }
 
     /**
@@ -376,16 +366,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * @param headerViewId layout view id.
      */
     public void setHeader(@LayoutRes int headerViewId) {
-        boolean hadHeaderBefore = hasHeader();
-
-        headerView = LayoutInflater.from(getContext()).inflate(headerViewId, null, false);
-        setDefaultLayoutParams(headerView);
-
-        if (hadHeaderBefore) {
-            notifyItemChanged(0);
-        } else {
-            notifyItemInserted(0);
-        }
+        setHeader(LayoutInflater.from(getContext()).inflate(headerViewId, null, false));
     }
 
     /**
