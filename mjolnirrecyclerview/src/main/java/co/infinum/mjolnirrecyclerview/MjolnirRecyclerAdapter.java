@@ -330,44 +330,81 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     // region Headers and Footers
 
     /**
-     * Add a footer view to this adapter. If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
+     * Add a footer view to this adapter. If footer already exists, it will be replaced.
      *
-     * @param footerViewId  layout view id.
-     * @param shouldReplace should we replace footer if it already exists
-     * @return true if footer was added/replaced, false otherwise.
+     * @param footerViewId layout view id.
      */
-    public boolean setFooter(@LayoutRes int footerViewId, boolean shouldReplace) {
-        if (shouldReplace || !hasFooter()) {
-            removeFooter();
-            int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-            footerView = LayoutInflater.from(getContext()).inflate(footerViewId, null, false);
-            setDefaultLayoutParams(footerView);
-            notifyItemInserted(position);
-            return true;
+    public void setFooter(@LayoutRes int footerViewId) {
+        boolean hadFooterBefore = hasFooter();
+
+        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
+        footerView = LayoutInflater.from(getContext()).inflate(footerViewId, null, false);
+        setDefaultLayoutParams(footerView);
+
+        if (hadFooterBefore) {
+            notifyItemChanged(position);
         } else {
-            return false;
+            notifyItemInserted(position);
         }
     }
 
     /**
      * Add a footer view to this adapter. If layout params for the {@param footerView}} are missing, default layout params will be set with
      * the {@link #setDefaultLayoutParams(View)} method.
-     * If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
+     * If footer already exists, it will be replaced.
      *
-     * @param footerView    layout view
-     * @param shouldReplace should we replace footer if it already exists
+     * @param footerView layout view
      * @return true if footer was added/replaced, false otherwise.
      */
-    public boolean setFooter(View footerView, boolean shouldReplace) {
-        if (shouldReplace || !hasFooter()) {
-            removeFooter();
-            int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-            this.footerView = footerView;
-            setDefaultLayoutParams(this.footerView);
-            notifyItemInserted(position);
-            return true;
+    public void setFooter(View footerView) {
+        boolean hadFooterBefore = hasFooter();
+
+        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
+        this.footerView = footerView;
+        setDefaultLayoutParams(this.footerView);
+
+        if (hadFooterBefore) {
+            notifyItemChanged(position);
         } else {
-            return false;
+            notifyItemInserted(position);
+        }
+    }
+
+    /**
+     * Add a header view to this adapter. If header already exists, it will be replaced.
+     *
+     * @param headerViewId layout view id.
+     */
+    public void setHeader(@LayoutRes int headerViewId) {
+        boolean hadHeaderBefore = hasHeader();
+
+        headerView = LayoutInflater.from(getContext()).inflate(headerViewId, null, false);
+        setDefaultLayoutParams(headerView);
+
+        if (hadHeaderBefore) {
+            notifyItemChanged(0);
+        } else {
+            notifyItemInserted(0);
+        }
+    }
+
+    /**
+     * Add a header view to this adapter. If layout params for the {@param headerView}} are missing, default layout params will be set with
+     * the {@link #setDefaultLayoutParams(View)} method.
+     * *
+     *
+     * @param headerView layout view
+     */
+    public void setHeader(View headerView) {
+        boolean hadHeaderBefore = hasHeader();
+
+        this.headerView = headerView;
+        setDefaultLayoutParams(this.headerView);
+
+        if (hadHeaderBefore) {
+            notifyItemChanged(0);
+        } else {
+            notifyItemInserted(0);
         }
     }
 
@@ -390,47 +427,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                         RecyclerView.LayoutParams.MATCH_PARENT);
                 view.setLayoutParams(layoutParams);
             }
-        }
-    }
-
-    /**
-     * Add a header view to this adapter. If header already exists, it will be replaced depending on the {@param shouldReplace} value.
-     *
-     * @param headerViewId  layout view id.
-     * @param shouldReplace should we replace header if it already exists
-     * @return true if header was added/replaced, false otherwise.
-     */
-    public boolean setHeader(@LayoutRes int headerViewId, boolean shouldReplace) {
-        if (shouldReplace || !hasHeader()) {
-            removeHeader();
-            headerView = LayoutInflater.from(getContext()).inflate(headerViewId, null, false);
-            setDefaultLayoutParams(headerView);
-            notifyItemInserted(0);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Add a header view to this adapter. If layout params for the {@param headerView}} are missing, default layout params will be set with
-     * the {@link #setDefaultLayoutParams(View)} method.
-     *
-     * If header already exists, it will be replaced depending on the {@param shouldReplace} value.
-     *
-     * @param headerView    layout view
-     * @param shouldReplace should we replace header if it already exists
-     * @return true if header was added/replaced, false otherwise.
-     */
-    public boolean setHeader(View headerView, boolean shouldReplace) {
-        if (shouldReplace || !hasHeader()) {
-            removeHeader();
-            this.headerView = headerView;
-            setDefaultLayoutParams(this.headerView);
-            notifyItemInserted(0);
-            return true;
-        } else {
-            return false;
         }
     }
 

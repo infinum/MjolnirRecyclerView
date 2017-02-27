@@ -19,7 +19,6 @@ import co.infinum.testapp.adapters.SimpleAdapter;
 /**
  * Created by Željko Plesac on 24/11/16.
  */
-
 public class GridActivity extends AppCompatActivity implements SimpleAdapter.OnClickListener<String> {
 
     private static final List<String> ITEMS = Collections.unmodifiableList(Arrays.asList(
@@ -59,8 +58,8 @@ public class GridActivity extends AppCompatActivity implements SimpleAdapter.OnC
 
         View footerView = getLayoutInflater().inflate(R.layout.view_footer, null);
 
-        adapter.setHeader(R.layout.view_header, true);
-        adapter.setFooter(footerView, false);
+        adapter.setHeader(R.layout.view_header);
+        adapter.setFooter(footerView);
     }
 
     @Override
