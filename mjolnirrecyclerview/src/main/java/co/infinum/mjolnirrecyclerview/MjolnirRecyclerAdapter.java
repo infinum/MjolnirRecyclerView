@@ -331,6 +331,10 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Add a footer view to this adapter. If footer already exists, it will be replaced.
+     ** <p>
+     * Note: setFooter should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
+     * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
+     * documentation.
      *
      * @param footerViewId layout view id.
      */
@@ -342,6 +346,10 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Add a footer view to this adapter. If layout params for the {@param footerView}} are missing, default layout params will be set with
      * the {@link #setDefaultLayoutParams(View)} method.
      * If footer already exists, it will be replaced.
+     * <p>
+     * Note: setFooter should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
+     * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
+     * documentation.
      *
      * @param footerView layout view
      * @return true if footer was added/replaced, false otherwise.
@@ -362,6 +370,10 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Add a header view to this adapter. If header already exists, it will be replaced.
+     * <p>
+     * Note: setHeader should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
+     * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
+     * documentation.
      *
      * @param headerViewId layout view id.
      */
@@ -372,7 +384,11 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     /**
      * Add a header view to this adapter. If layout params for the {@param headerView}} are missing, default layout params will be set with
      * the {@link #setDefaultLayoutParams(View)} method.
-     * *
+     * <p>
+     * Note: setHeader should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
+     * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
+     * documentation.
+     *
      *
      * @param headerView layout view
      */
