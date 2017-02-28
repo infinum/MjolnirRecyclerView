@@ -1,7 +1,8 @@
 package co.infinum.mjolnirrecyclerview;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,11 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.lang.ref.WeakReference;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Custom implementation of RecyclerView.Adapter, which has following features:
@@ -51,9 +55,15 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     private View headerView;
 
-    private UpdateItemsTask updateItemsTask;
+    private Handler handler = new Handler(Looper.getMainLooper());
+
+    protected boolean isCancelled = false;
 
     protected boolean isLoading = false;
+
+    protected Queue<Collection<E>> pendingUpdates = new ArrayDeque<>();
+
+    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private RecyclerView.LayoutManager layoutManager;
 
@@ -65,15 +75,14 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     @Override
     public MjolnirViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // Check if we have to inflate ItemViewHolder of HeaderFooterHolder
-        if (viewType == TYPE_ITEM) {
-            return onCreateItemViewHolder(parent, viewType);
-        } else if (viewType == TYPE_HEADER) {
-            return onCreateHeaderViewHolder();
-        } else if (viewType == TYPE_FOOTER) {
-            return onCreateFooterViewHolder();
+        switch (viewType) {
+            case TYPE_HEADER:
+                return onCreateHeaderViewHolder();
+            case TYPE_FOOTER:
+                return onCreateFooterViewHolder();
+            default:
+                return onCreateItemViewHolder(parent, viewType);
         }
-
-        return null;
     }
 
     /**
@@ -103,7 +112,11 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
         //check what type of view our position is
         switch (getItemViewType(position)) {
-            case TYPE_ITEM:
+            case TYPE_HEADER:
+            case TYPE_FOOTER:
+                //Nothing, for now.
+                break;
+            default:
                 position = calculateIndex(position, true);
                 E item = items.get(position);
                 holder.bind(item, position, payloads);
@@ -113,9 +126,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                     isLoading = true;
                     nextPageListener.onScrolledToNextPage();
                 }
-                break;
-            default:
-                //Nothing, for now.
                 break;
         }
     }
@@ -167,13 +177,18 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Cancels the UpdateItems AsyncTask, so that we don't perform any UI updates. This method must be called when your activity
-     * or fragment is about to be destroyed, so that we don't risk any UI exceptions.
+     * Sets the isCancelled flag to true, which will cancel DiffUtil.DiffResult update dispatch to the adapter. Call this method when
+     * your activity or fragment is about to be destroyed.
      */
     public void cancel() {
-        if (updateItemsTask != null) {
-            updateItemsTask.cancel(true);
-        }
+        isCancelled = true;
+    }
+
+    /**
+     * Sets the isCancelled flag to false, which will enable DiffUtil.DiffResult update dispatch to the adapter.
+     */
+    public void reset() {
+        isCancelled = false;
     }
 
     public boolean isLoading() {
@@ -253,10 +268,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         notifyItemChanged(calculateIndex(index, false));
     }
 
-    public void reset(Collection<E> collection) {
-        reset(collection, null);
-    }
-
     /**
      * Clears current items.
      */
@@ -266,30 +277,23 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     /**
-     * Resets the current adapter state - clear current items, add new ones and execute UpdateItems task.
+     * Update the current adapter state. If {@param callback} is provided, an updated data set is calculated with DiffUtil, otherwise
+     * current data set is clear and {@param newItems} are added to the internal items collection.
      *
-     * @param collection Collection of new items, which are added to adapter.
-     * @param callback   DiffUtil callback, which is used to update the items.
-     */
-    public void reset(Collection<E> collection, @Nullable DiffUtil.Callback callback) {
-        items.clear();
-        items.addAll(collection);
-        if (callback != null) {
-            update(callback);
-        } else {
-            notifyDataSetChanged();
-        }
-    }
-
-    /**
-     * Update current adapter state by executing UpdateItems, which will execute UpdateItems task with {@param callback} as
-     * input parameter.
-     *
+     * @param newItems Collection of new items, which are added to adapter.
      * @param callback DiffUtil callback, which is used to update the items.
      */
-    public void update(@NonNull DiffUtil.Callback callback) {
-        updateItemsTask = new UpdateItemsTask(this);
-        updateItemsTask.execute(callback);
+    public void update(Collection<E> newItems, @Nullable DiffUtil.Callback callback) {
+        if (callback != null) {
+            pendingUpdates.add(newItems);
+            if (pendingUpdates.size() == 1) {
+                updateData(newItems, callback);
+            }
+        } else {
+            items.clear();
+            items.addAll(newItems);
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -326,86 +330,78 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     // region Headers and Footers
 
     /**
-     * Add a footer to this adapter.
-     * This method has higher priority than {@link #addFooter(android.view.View)}.
-     *
-     * Deprecated in version 1.1.0, use  {@link #addFooter(int footerViewId, boolean shouldReplace)  instead.
-     *
-     * @param footerViewId layout resource id
-     */
-    @Deprecated
-    public void addFooter(@LayoutRes int footerViewId) {
-        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-        footerView = LayoutInflater.from(getContext()).inflate(footerViewId, null, false);
-        setDefaultLayoutParams(footerView);
-        notifyItemInserted(position);
-    }
-
-    /**
-     * Add a footer view to this adapter. If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
-     * <p>
-     * Note: addFooter should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
+     * Add a footer view to this adapter. If footer already exists, it will be replaced.
+     ** <p>
+     * Note: setFooter should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
      * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
      * documentation.
      *
-     *
-     * @param footerViewId  layout view id.
-     * @param shouldReplace should we replace footer if it already exists
-     * @return true if footer was added/replaced, false otherwise.
+     * @param footerViewId layout view id.
      */
-    public boolean addFooter(@LayoutRes int footerViewId, boolean shouldReplace) {
-        if (shouldReplace || !hasFooter()) {
-            removeFooter();
-            int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-            footerView = LayoutInflater.from(getContext()).inflate(footerViewId, null, false);
-            setDefaultLayoutParams(footerView);
-            notifyItemInserted(position);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Add a footer view to this adapter.
-     * This method has lower priority than {@link #addFooter(int)}.
-     *
-     * Deprecated in version 1.1.0, use  {@link #addFooter(View headerView, boolean shouldReplace)} instead.
-     *
-     * @param footerView layout view
-     */
-    @Deprecated
-    public void addFooter(View footerView) {
-        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-        this.footerView = footerView;
-        setDefaultLayoutParams(footerView);
-        notifyItemInserted(position);
+    public void setFooter(@LayoutRes int footerViewId) {
+        setFooter(LayoutInflater.from(getContext()).inflate(footerViewId, null, false));
     }
 
     /**
      * Add a footer view to this adapter. If layout params for the {@param footerView}} are missing, default layout params will be set with
      * the {@link #setDefaultLayoutParams(View)} method.
-     *
-     * If footer already exists, it will be replaced depending on the {@param shouldReplace} value.
+     * If footer already exists, it will be replaced.
      * <p>
-     * Note: addFooter should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
+     * Note: setFooter should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
      * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
      * documentation.
      *
-     * @param footerView    layout view
-     * @param shouldReplace should we replace footer if it already exists
+     * @param footerView layout view
      * @return true if footer was added/replaced, false otherwise.
      */
-    public boolean addFooter(View footerView, boolean shouldReplace) {
-        if (shouldReplace || !hasFooter()) {
-            removeFooter();
-            int position = getCollectionCount() + (hasHeader() ? 1 : 0);
-            this.footerView = footerView;
-            setDefaultLayoutParams(this.footerView);
-            notifyItemInserted(position);
-            return true;
+    public void setFooter(View footerView) {
+        boolean hadFooterBefore = hasFooter();
+
+        int position = getCollectionCount() + (hasHeader() ? 1 : 0);
+        this.footerView = footerView;
+        setDefaultLayoutParams(this.footerView);
+
+        if (hadFooterBefore) {
+            notifyItemChanged(position);
         } else {
-            return false;
+            notifyItemInserted(position);
+        }
+    }
+
+    /**
+     * Add a header view to this adapter. If header already exists, it will be replaced.
+     * <p>
+     * Note: setHeader should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
+     * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
+     * documentation.
+     *
+     * @param headerViewId layout view id.
+     */
+    public void setHeader(@LayoutRes int headerViewId) {
+        setHeader(LayoutInflater.from(getContext()).inflate(headerViewId, null, false));
+    }
+
+    /**
+     * Add a header view to this adapter. If layout params for the {@param headerView}} are missing, default layout params will be set with
+     * the {@link #setDefaultLayoutParams(View)} method.
+     * <p>
+     * Note: setHeader should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
+     * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
+     * documentation.
+     *
+     *
+     * @param headerView layout view
+     */
+    public void setHeader(View headerView) {
+        boolean hadHeaderBefore = hasHeader();
+
+        this.headerView = headerView;
+        setDefaultLayoutParams(this.headerView);
+
+        if (hadHeaderBefore) {
+            notifyItemChanged(0);
+        } else {
+            notifyItemInserted(0);
         }
     }
 
@@ -428,85 +424,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                         RecyclerView.LayoutParams.MATCH_PARENT);
                 view.setLayoutParams(layoutParams);
             }
-        }
-    }
-
-    /**
-     * Add a header to this adapter.
-     * This method has higher priority than {@link #addHeader(android.view.View)}.
-     *
-     * Deprecated in version 1.1.0, use  {@link #addHeader(int headerViewId, boolean shouldReplace)} instead.
-     *
-     * @param headerViewId layout resource id
-     */
-    @Deprecated
-    public void addHeader(@LayoutRes int headerViewId) {
-        headerView = LayoutInflater.from(getContext()).inflate(headerViewId, null, false);
-        setDefaultLayoutParams(headerView);
-        notifyItemInserted(0);
-    }
-
-    /**
-     * Add a header view to this adapter. If header already exists, it will be replaced depending on the {@param shouldReplace} value.
-     * <p>
-     * Note: addHeader should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
-     * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
-     * documentation.
-     *
-     * @param headerViewId  layout view id.
-     * @param shouldReplace should we replace header if it already exists
-     * @return true if header was added/replaced, false otherwise.
-     */
-    public boolean addHeader(@LayoutRes int headerViewId, boolean shouldReplace) {
-        if (shouldReplace || !hasHeader()) {
-            removeHeader();
-            headerView = LayoutInflater.from(getContext()).inflate(headerViewId, null, false);
-            setDefaultLayoutParams(headerView);
-            notifyItemInserted(0);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Add a header view to this adapter.
-     * This method has lower priority than {@link #addHeader(int)}.
-     *
-     * Deprecated in version 1.1.0, use  {@link #addHeader(View headerView, boolean shouldReplace)} instead.
-     *
-     * @param headerView layout view
-     */
-    @Deprecated
-    public void addHeader(View headerView) {
-        this.headerView = headerView;
-        setDefaultLayoutParams(headerView);
-        notifyItemInserted(0);
-    }
-
-    /**
-     * Add a header view to this adapter. If layout params for the {@param headerView}} are missing, default layout params will be set with
-     * the {@link #setDefaultLayoutParams(View)} method.
-     *
-     * If header already exists, it will be replaced depending on the {@param shouldReplace} value.
-     * <p>
-     * Note: addHeader should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
-     * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
-     * documentation.
-     *
-     * @param headerView    layout view
-     * @param shouldReplace should we replace header if it already exists
-     * @return true if header was added/replaced, false otherwise.
-     */
-    public boolean addHeader(View headerView, boolean shouldReplace) {
-        if (shouldReplace || !hasHeader()) {
-            removeHeader();
-            this.headerView = headerView;
-            setDefaultLayoutParams(this.headerView);
-            notifyItemInserted(0);
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -617,15 +534,25 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      */
     @Override
     public int getItemViewType(int position) {
-
         //check what type our position is, based on the assumption that the order is headers > items > footers
         if (isHeader(position)) {
             return TYPE_HEADER;
         } else if (isFooter(position)) {
             return TYPE_FOOTER;
         }
+
+        return getAdditionalItemViewType(position);
+    }
+
+    /**
+     * Override this method if you are using custom ItemViewType and provide correct implementation.
+     *
+     * @return +
+     */
+    protected int getAdditionalItemViewType(int position) {
         return TYPE_ITEM;
     }
+
 
     public interface OnClickListener<E> {
 
@@ -639,29 +566,45 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     // endregion
 
-    static class UpdateItemsTask extends AsyncTask<DiffUtil.Callback, Void, DiffUtil.DiffResult> {
-
-        private WeakReference<MjolnirRecyclerAdapter> adapterWeakReference;
-
-        public UpdateItemsTask(MjolnirRecyclerAdapter adapter) {
-            this.adapterWeakReference = new WeakReference<>(adapter);
-        }
-
-        @Override
-        protected DiffUtil.DiffResult doInBackground(DiffUtil.Callback... params) {
-            if (params != null) {
-                return DiffUtil.calculateDiff(params[0]);
-            } else {
-                return null;
+    /**
+     * Calculates provided {@param callback} DiffResult by using DiffUtils.
+     *
+     * @param newItems Collection of new items, with which our current items collection is updated.
+     * @param callback DiffUtil.Callback on which DiffResult is calculated.
+     */
+    private void updateData(final Collection<E> newItems, final DiffUtil.Callback callback) {
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
+                postDiffResults(newItems, diffResult, callback);
             }
-        }
+        });
+    }
 
-        @Override
-        protected void onPostExecute(DiffUtil.DiffResult diffResult) {
-            super.onPostExecute(diffResult);
-            if (adapterWeakReference.get() != null && diffResult != null) {
-                diffResult.dispatchUpdatesTo(adapterWeakReference.get());
-            }
+    /**
+     * Dispatched {@param diffResult} DiffResults to the adapter if adapter has not been cancelled. If there are any queued pending updates,
+     * it will peek the latest new items collection and once again update the adapter content.
+     *
+     * @param newItems   Collection of new items, with which our current items collection is updated.
+     * @param diffResult DiffUtil.DiffResult which was calculated for {@param callback}.
+     * @param callback   DiffUtil.Callback on which DiffResult was calculated.
+     */
+    private void postDiffResults(final Collection<E> newItems, final DiffUtil.DiffResult diffResult, final DiffUtil.Callback callback) {
+        if (!isCancelled) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    pendingUpdates.remove();
+                    diffResult.dispatchUpdatesTo(MjolnirRecyclerAdapter.this);
+                    items.clear();
+                    items.addAll(newItems);
+
+                    if (pendingUpdates.size() > 0) {
+                        updateData(pendingUpdates.peek(), callback);
+                    }
+                }
+            });
         }
     }
 }
