@@ -26,8 +26,8 @@ Check the latest version [here](https://bintray.com/search?query=mjolnirrecycler
 Add a custom number of headers and footers to [MjolnirRecyclerView](https://github.com/infinum/MjolnirRecyclerView/blob/master/mjolnirrecyclerview/src/main/java/co/infinum/mjolnirrecyclerview/MjolnirRecyclerView.java) by using 2 simple methods from [MjolnirRecyclerAdapter](https://github.com/infinum/MjolnirRecyclerView/blob/master/mjolnirrecyclerview/src/main/java/co/infinum/mjolnirrecyclerview/MjolnirRecyclerAdapter.java):
 
 ```java
-    adapter.addHeader(View view)
-    adapter.addFooter(View view)
+    adapter.setHeader(View view)
+    adapter.setHeader(View view)
 ```    
 
 ### 2. Empty view
