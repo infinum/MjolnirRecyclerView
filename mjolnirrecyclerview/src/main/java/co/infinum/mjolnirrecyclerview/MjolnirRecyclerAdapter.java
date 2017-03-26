@@ -214,7 +214,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     }
 
     public void add(E item, int index) {
-        if (index != 0 && items.size() > 0 && index >= items.size()) {
+        if (index > items.size()) {
             throw new IllegalStateException("Index is defined in wrong range!");
         } else {
             items.add(index, item);
