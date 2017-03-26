@@ -45,12 +45,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     protected OnNextPageListener nextPageListener;
 
-    protected boolean isCancelled = false;
-
-    protected boolean isLoading = false;
-
-    protected Queue<Collection<E>> pendingUpdates = new ArrayDeque<>();
-
     private Context context;
 
     private List<E> items;
@@ -62,6 +56,12 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
     private View headerView;
 
     private Handler handler = new Handler(Looper.getMainLooper());
+
+    protected boolean isCancelled = false;
+
+    protected boolean isLoading = false;
+
+    protected Queue<Collection<E>> pendingUpdates = new ArrayDeque<>();
 
     private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -331,7 +331,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Add a footer view to this adapter. If footer already exists, it will be replaced.
-     * * <p>
+     ** <p>
      * Note: setFooter should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
      * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
      * documentation.
@@ -388,6 +388,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Note: setHeader should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
      * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
      * documentation.
+     *
      *
      * @param headerView layout view
      */
@@ -552,6 +553,19 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
         return TYPE_ITEM;
     }
 
+
+    public interface OnClickListener<E> {
+
+        void onClick(int index, E item);
+    }
+
+    public interface OnNextPageListener {
+
+        void onScrolledToNextPage();
+    }
+
+    // endregion
+
     /**
      * Calculates provided {@param callback} DiffResult by using DiffUtils.
      *
@@ -592,17 +606,5 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                 }
             });
         }
-    }
-
-    // endregion
-
-    public interface OnClickListener<E> {
-
-        void onClick(int index, E item);
-    }
-
-    public interface OnNextPageListener {
-
-        void onScrolledToNextPage();
     }
 }
