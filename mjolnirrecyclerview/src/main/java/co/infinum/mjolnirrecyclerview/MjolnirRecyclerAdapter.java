@@ -122,9 +122,18 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                 holder.bind(item, position, payloads);
 
                 if (nextPageListener != null && !isLoading
-                        && position >= getCollectionCount() - getNextPageOffset()) {
+                        && position >= getCollectionCount() - getNextPageOffset() && !isCancelled) {
                     isLoading = true;
-                    nextPageListener.onScrolledToNextPage();
+
+                    // If RecyclerView is currently computing a layout, it's in a lockdown state and any
+                    // attempt to update adapter contents will result in an exception. In these cases, we need to postpone the change
+                    // using a Handler.
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            nextPageListener.onScrolledToNextPage();
+                        }
+                    });
                 }
                 break;
         }
@@ -331,7 +340,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     /**
      * Add a footer view to this adapter. If footer already exists, it will be replaced.
-     ** <p>
+     * * <p>
      * Note: setFooter should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
      * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
      * documentation.
@@ -388,7 +397,6 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
      * Note: setHeader should be called only after {@link MjolnirRecyclerView#setAdapter(RecyclerView.Adapter)} otherwise the default
      * layout params wont apply to this view. For more info about the default layout params check {@link #setDefaultLayoutParams(View)}
      * documentation.
-     *
      *
      * @param headerView layout view
      */
