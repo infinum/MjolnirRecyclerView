@@ -122,7 +122,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
                 holder.bind(item, position, payloads);
 
                 if (nextPageListener != null && !isLoading
-                        && position >= getCollectionCount() - getNextPageOffset()) {
+                        && position >= getCollectionCount() - getNextPageOffset() && !isCancelled) {
                     isLoading = true;
 
                     // If RecyclerView is currently computing a layout, it's in a lockdown state and any
