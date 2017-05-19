@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 25
@@ -28,6 +27,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile project(':mjolnirrecyclerview')
 
-    compile 'com.jakewharton:butterknife:8.4.0'
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.jakewharton:butterknife:8.6.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
 }
