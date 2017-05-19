@@ -47,7 +47,7 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
 
     private Context context;
 
-    private List<E> items;
+    protected List<E> items;
 
     private int nextPageOffset = 1;
 
