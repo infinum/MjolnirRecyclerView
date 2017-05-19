@@ -549,18 +549,18 @@ public abstract class MjolnirRecyclerAdapter<E> extends RecyclerView.Adapter<Mjo
             return TYPE_FOOTER;
         }
 
-        return getAdditionalItemViewType(position);
+        return getAdditionalItemViewType(position, calculateIndex(position, true));
     }
 
     /**
      * Override this method if you are using custom ItemViewType and provide correct implementation.
-     *
-     * @return +
+     * @param adapterPosition current adapter position
+     * @param itemPosition current item positions, which is different from {@param adapterPosition} if adapter has header view.
+     * @return item view type.
      */
-    protected int getAdditionalItemViewType(int position) {
+    protected int getAdditionalItemViewType(int adapterPosition, int itemPosition) {
         return TYPE_ITEM;
     }
-
 
     public interface OnClickListener<E> {
 
