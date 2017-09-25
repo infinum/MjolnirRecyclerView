@@ -47,14 +47,14 @@ public class EmptyViewActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setEmptyView(emptyView, true);
+        adapter = new SimpleAdapter(EmptyViewActivity.this);
+        recyclerView.setAdapter(adapter);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (!isFinishing()) {
-                    adapter = new SimpleAdapter(EmptyViewActivity.this);
-                    recyclerView.setAdapter(adapter);
                     adapter.addAll(ITEMS);
                 }
             }
