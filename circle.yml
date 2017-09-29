@@ -23,14 +23,12 @@ machine:
 dependencies:
   pre:
     - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-25
-    - echo y | android update sdk --no-ui --all --filter build-tools-25.0.3
+    - echo y | android update sdk --no-ui --all --filter build-tools-26.0.1
 
 test:
   override:
     # build the project and run static analysis while we wait for the emulator to boot (lint, pmd, findbugs, checkstyle)
-    - ./gradlew assembleDebug -PdisablePreDex
-    # run static analysis
-    - ./gradlew checkstyle pmd findbugs -PdisablePreDex
+    - ./gradlew lintDebug checkstyle pmd findbugs -PdisablePreDex
   post:
     # copy the build outputs to artifacts
     - cp -r mjolnirrecyclerview/build/outputs $CIRCLE_ARTIFACTS
