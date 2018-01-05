@@ -26,7 +26,7 @@ jobs:
           command: ./gradlew checkstyle -PdisablePreDex
       - run:
           name: Run pmd
-          command: ./gradlew detektCheck -PdisablePreDex
+          command: ./gradlew pmd -PdisablePreDex
       - run:
           name: Run findbugs
           command: ./gradlew findbugs -PdisablePreDex
