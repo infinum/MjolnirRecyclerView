@@ -6,7 +6,7 @@ apply plugin: 'net.ltgt.errorprone'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "26.0.2"
+    buildToolsVersion "27.0.2"
 
     defaultConfig {
         minSdkVersion 14
