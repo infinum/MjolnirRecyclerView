@@ -1,0 +1,38 @@
+# Build configuration file for Circle CI
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-27-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum "mjolnirrecyclerview/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum "mjolnirrecyclerview/build.gradle" }}
+      - run:
+          name: Run Android Lint
+          command: ./gradlew lintDebug -PdisablePreDex
+      - run:
+          name: Run checkstyle
+          command: ./gradlew checkstyle -PdisablePreDex
+      - run:
+          name: Run pmd
+          command: ./gradlew detektCheck -PdisablePreDex
+      - run:
+          name: Run findbugs
+          command: ./gradlew findbugs -PdisablePreDex
+      - store_artifacts:
+          path: mjolnirrecyclerview/build/reports
+          destination: reports
+      - store_artifacts:
+          path: mjolnirrecyclerview/build/outputs
+          destination: outputs
