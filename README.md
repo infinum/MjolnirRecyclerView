@@ -1,4 +1,5 @@
-MjolnirRecyclerView
+# [DEPRECATED] MjolnirRecyclerView - This library is no longer maintained and it will not receive any more updates. 
+
 ==========
 
 [![CircleCI](https://circleci.com/gh/infinum/MjolnirRecyclerView/tree/master.svg?style=svg&circle-token=d7d31554a2af2654f26885397e9dda150cc07428)](https://circleci.com/gh/infinum/MjolnirRecyclerView/tree/master)
